@@ -112,8 +112,10 @@ async function generatePoster(queueItem) {
     };
 
     const backgroundRGB = hexToRgb(colorSchemeData.backgroundColor);
-    const outlineRGB = hexToRgb(colorSchemeData.outlineColorOuter);
+    const outlineInnerRGB = hexToRgb(colorSchemeData.outlineColorInner);
+    const outlineOuterRGB = hexToRgb(colorSchemeData.outlineColorOuter);
     const textRGB = hexToRgb(colorSchemeData.textColor);
+    const extraTitleRGB = hexToRgb(colorSchemeData.extraTitle);
     const compassRGB = hexToRgb(colorSchemeData.compassColor);
     const fileName = `cp-canvas__${isHorizontal ? "horizontal" : "vertical"}__${formattedSize}.ai`;
 
@@ -216,8 +218,10 @@ async function generatePoster(queueItem) {
       }
 
       var textColor = makeRGB(${textRGB.join(",")});
+      var extraTitleColor = makeRGB(${extraTitleRGB.join(",")});
       var backgroundColor = makeRGB(${backgroundRGB.join(",")});
-      var outlineColor = makeRGB(${outlineRGB.join(",")});
+      var outlineInnerColor = makeRGB(${outlineInnerRGB.join(",")});
+      var outlineOuterColor = makeRGB(${outlineOuterRGB.join(",")});
       var compassColor = makeRGB(${compassRGB.join(",")});
 
       var textLayer = doc.layers.getByName("text");
@@ -229,15 +233,29 @@ async function generatePoster(queueItem) {
         textLayer.textFrames[2].contents = ${JSON.stringify(underTitle || "")};
         textLayer.textFrames[2].textRange.fillColor = textColor;
         textLayer.textFrames[3].contents = ${JSON.stringify(extraTitle || "")};
-        textLayer.textFrames[3].textRange.fillColor = textColor;
+        textLayer.textFrames[3].textRange.fillColor = extraTitleColor;
       }
 
       try { doc.pageItems.getByName("background").fillColor = backgroundColor; } catch(e) {}
 
-      for (var i = 0; i < doc.pageItems.length; i++) {
-        if (doc.pageItems[i].name.indexOf("outline") !== -1) {
-          doc.pageItems[i].strokeColor = outlineColor;
-        }
+      // Handle outline layer with inner and outer elements
+      var outlineLayer = doc.layers.getByName("outline");
+      if (outlineLayer) {
+        // Target outlineInner element
+        try {
+          var outlineInnerElement = doc.pageItems.getByName("outlineInner");
+          if (outlineInnerElement) {
+            outlineInnerElement.strokeColor = outlineInnerColor;
+          }
+        } catch(e) {}
+
+        // Target outlineOuter element
+        try {
+          var outlineOuterElement = doc.pageItems.getByName("outlineOuter");
+          if (outlineOuterElement) {
+            outlineOuterElement.strokeColor = outlineOuterColor;
+          }
+        } catch(e) {}
       }
 
       var signatureLayer = doc.layers.getByName("signature");
@@ -349,7 +367,11 @@ async function generatePoster(queueItem) {
               var frame = scorecardLayer.textFrames[j];
               if (frame.contents === "m" + (i + 1)) frame.contents = distance.toString();
               if (frame.contents === "p" + (i + 1)) frame.contents = par.toString();
-              if (frame.contents === "s" + (i + 1)) frame.contents = userScore.toString();
+              if (frame.contents === "s" + (i + 1)) {
+                // Persist a stable name so we can reference this exact score later
+                try { frame.name = "s" + (i + 1); } catch(e) {}
+                frame.contents = userScore.toString();
+              }
             }
           }
 
@@ -443,11 +465,17 @@ async function generatePoster(queueItem) {
 
                 // If this background has an indicator, make the corresponding score text white
                 if (shouldFill) {
-                  for (var l = 0; l < scorecardLayer.textFrames.length; l++) {
-                    var textFrame = scorecardLayer.textFrames[l];
-                    if (textFrame.contents === userScore) {
-                      textFrame.textRange.fillColor = makeRGB(255, 255, 255); // White text
-                      break;
+                  try {
+                    var scoreTextFrame = scorecardLayer.textFrames.getByName("s" + holeNumber);
+                    scoreTextFrame.textRange.fillColor = makeRGB(255, 255, 255);
+                  } catch(e) {
+                    // Fallback to contents matching if named frame is not found
+                    for (var l = 0; l < scorecardLayer.textFrames.length; l++) {
+                      var textFrame = scorecardLayer.textFrames[l];
+                      if (textFrame.contents === userScore) {
+                        textFrame.textRange.fillColor = makeRGB(255, 255, 255);
+                        break;
+                      }
                     }
                   }
                 }

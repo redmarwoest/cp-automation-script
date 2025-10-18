@@ -6,7 +6,7 @@
 const whiteColors = {
   backgroundColor: "#ffffff",
   textColor: "#000000",
-  outlineColorInner: "#9b9c9c",
+  outlineColorInner: "#9a9a9a",
   outlineColorOuter: "#000000",
   compassColor: "#888888",
   scoreCardColor: "#000000",
@@ -16,7 +16,7 @@ const whiteColors = {
   water: "#CFD9DA",
   sand: "#F3EE95",
   sandOutline: "#f5ec99",
-  green: "#add68d",
+  green: "#a6ad4c",
   greenOutline: "#f5ec99",
   tee: "#758838",
   teeOutline: "#525d29",
@@ -26,14 +26,14 @@ const whiteColors = {
   numberContainerOutline: "#991B1E",
   clubHouse: "#4e4e4e",
   signature: "#000000",
-  extraTitle: "#DAA520",
+  extraTitle: "#9a7e2e",
   wasteLand: "#edece3",
 };
 
 const blueColors = {
   backgroundColor: "#E6EAEF",
   textColor: "#1F4A70",
-  outlineColorInner: "#9b9c9c",
+  outlineColorInner: "#7086a6",
   outlineColorOuter: "#1F4A70",
   compassColor: "#1F4A70",
   scoreCardColor: "#1F4A70",
@@ -53,14 +53,14 @@ const blueColors = {
   numberContainerOutline: "#1a2b40",
   clubHouse: "#4e4e4e",
   signature: "#ffffff",
-  extraTitle: "#DAA520",
+  extraTitle: "#9a7e2e",
   wasteLand: "#edece3",
 };
 
 const greenColors = {
   backgroundColor: "#D5EAD3",
   textColor: "#316E36",
-  outlineColorInner: "#9b9c9c",
+  outlineColorInner: "#80b087",
   outlineColorOuter: "#316E36",
   compassColor: "#316E36",
   scoreCardColor: "#316E36",
@@ -80,15 +80,15 @@ const greenColors = {
   numberContainerOutline: "#1a2b40",
   clubHouse: "#4e4e4e",
   signature: "#ffffff",
-  extraTitle: "#DAA520",
+  extraTitle: "#9a7e2e",
   wasteLand: "#edece3",
 };
 
 const navyColors = {
   backgroundColor: "#7086A6",
   textColor: "#FFFFFF",
-  outlineColorInner: "#ffffff",
-  outlineColorOuter: "#ffffff",
+  outlineColorInner: "#9a9a9a",
+  outlineColorOuter: "#000000",
   compassColor: "#FFFFFF",
   scoreCardColor: "#FFFFFF",
   fairway: "#4D4E4E",
@@ -107,14 +107,14 @@ const navyColors = {
   numberContainerOutline: "#1a2b40",
   clubHouse: "#4e4e4e",
   signature: "#ffffff",
-  extraTitle: "#DAA520",
+  extraTitle: "#9a7e2e",
   wasteLand: "#edece3",
 };
 
 const brownColors = {
   backgroundColor: "#B4B3A8",
   textColor: "#FFFFFF",
-  outlineColorInner: "#9b9c9c",
+  outlineColorInner: "#9a9a9a",
   outlineColorOuter: "#231F20",
   compassColor: "#FFFFFF",
   scoreCardColor: "#FFFFFF",
@@ -134,7 +134,7 @@ const brownColors = {
   numberContainerOutline: "#1a2b40",
   clubHouse: "#4e4e4e",
   signature: "#ffffff",
-  extraTitle: "#DAA520",
+  extraTitle: "#9a7e2e",
   wasteLand: "#edece3",
 };
 
