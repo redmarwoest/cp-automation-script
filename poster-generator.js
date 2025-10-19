@@ -483,6 +483,22 @@ async function generatePoster(queueItem) {
             }
           }
 
+          // Update distance unit text (e.g., "Meters" -> distanceUnit value)
+          for (var j = 0; j < scorecardLayer.textFrames.length; j++) {
+            var frame = scorecardLayer.textFrames[j];
+            if (frame.contents === "Meters") {
+              var distanceUnit = "${distanceUnit || 'Meters'}";
+              // Handle specific cases: yards -> Yards, default to Meters
+              var displayUnit;
+              if (distanceUnit.toLowerCase() === "yards") {
+                displayUnit = "Yards";
+              } else {
+                displayUnit = "Meters"; // Default/standard
+              }
+              frame.contents = displayUnit;
+            }
+          }
+
           // Strokes
           for (var j = 0; j < scorecardLayer.pageItems.length; j++) {
             try { if (scorecardLayer.pageItems[j].stroked) scorecardLayer.pageItems[j].strokeColor = textColor; } catch(e) {}
