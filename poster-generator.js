@@ -128,52 +128,93 @@ async function generatePoster(queueItem) {
       "/Users/redmarwoest/Documents/selected-course-map.svg"
     );
 
-    let svgContent = selectedCourseMap;
-    if (selectedCourseMap.startsWith("data:image/svg+xml;base64,")) {
-      const base64Data = selectedCourseMap.replace(
-        "data:image/svg+xml;base64,",
-        ""
-      );
-      svgContent = Buffer.from(base64Data, "base64").toString("utf-8");
-    } else if (selectedCourseMap.startsWith("data:image/svg+xml,")) {
-      const urlData = selectedCourseMap.replace("data:image/svg+xml,", "");
-      svgContent = decodeURIComponent(urlData);
-    }
+    // Decode base64 data URL if needed (using the working approach)
+    const decodeBase64DataURL = (dataURL) => {
+      if (dataURL.startsWith("data:image/svg+xml;base64,")) {
+        try {
+          const base64 = dataURL.replace("data:image/svg+xml;base64,", "");
+          const decoded = Buffer.from(base64, "base64").toString("utf-8");
+          return decoded;
+        } catch (error) {
+          console.error("Error decoding base64 data URL:", error);
+          return dataURL;
+        }
+      }
+      return dataURL;
+    };
 
-    try {
-      const dom = new JSDOM(svgContent, { contentType: "image/svg+xml" });
+    const updateSvgColors = (svgString, colors) => {
+      // Decode base64 data URL if needed
+      const decodedSvg = decodeBase64DataURL(svgString);
+
+      const dom = new JSDOM(decodedSvg, { contentType: "image/svg+xml" });
       const doc = dom.window.document;
-      const selectedColors = colorSchemes[finalColorScheme];
 
-      Object.keys(selectedColors).forEach((key) => {
+      Object.keys(colors).forEach((key) => {
         const elements = doc.querySelectorAll(`#${key}, #${key} *`);
-        elements.forEach((el) => {
-          const tag = el.tagName.toLowerCase();
+
+        elements.forEach((element) => {
           if (
-            [
-              "path",
-              "polygon",
-              "circle",
-              "text",
-              "rect",
-              "line",
-              "polyline",
-            ].includes(tag)
+            element.tagName === "path" ||
+            element.tagName === "polygon" ||
+            element.tagName === "circle" ||
+            element.tagName === "text" ||
+            element.tagName === "rect" ||
+            element.tagName === "line" ||
+            element.tagName === "polyline"
           ) {
-            if (tag !== "polyline" && el.hasAttribute("fill")) {
-              el.setAttribute("fill", selectedColors[key]);
+            // Set fill if not already set and not a polyline
+            if (element.tagName !== "polyline" && element.hasAttribute("fill")) {
+              element.setAttribute("fill", colors[key] || "");
             }
-            if (el.hasAttribute("stroke")) {
-              el.setAttribute("stroke", selectedColors[key]);
+
+            // Set stroke if not already set
+            if (element.hasAttribute("stroke")) {
+              element.setAttribute("stroke", colors[key] || "");
             }
           }
         });
       });
 
-      const updatedSvg = dom.serialize();
+      // Handle outline colors for specific elements
+      const outlineElements = [
+        { elementId: "green", outlineKey: "greenOutline" },
+        { elementId: "sand", outlineKey: "sandOutline" },
+        { elementId: "fairway", outlineKey: "fairwayOutline" },
+        { elementId: "numberContainer", outlineKey: "numberContainerOutline" },
+      ];
+
+      outlineElements.forEach(({ elementId, outlineKey }) => {
+        if (colors[outlineKey]) {
+          const elements = doc.querySelectorAll(`#${elementId}, #${elementId} *`);
+
+          elements.forEach((element) => {
+            if (
+              element.tagName === "path" ||
+              element.tagName === "polygon" ||
+              element.tagName === "circle" ||
+              element.tagName === "text" ||
+              element.tagName === "rect" ||
+              element.tagName === "line" ||
+              element.tagName === "polyline"
+            ) {
+              // Apply outline color to stroke
+              element.setAttribute("stroke", colors[outlineKey] || "");
+            }
+          });
+        }
+      });
+
+      return dom.serialize();
+    };
+
+    try {
+      const selectedColors = colorSchemes[finalColorScheme];
+      const updatedSvg = updateSvgColors(selectedCourseMap, selectedColors);
       fs.writeFileSync(svgPath, updatedSvg);
-    } catch {
-      fs.writeFileSync(svgPath, svgContent);
+    } catch (error) {
+      console.error("Error processing SVG:", error);
+      fs.writeFileSync(svgPath, selectedCourseMap);
     }
 
     // Create dynamic filename with order ID
