@@ -1,5 +1,5 @@
 
-      var file = new File("/Users/redmarwoest/Documents/cp-canvas__horizontal__300x400.ai");
+      var file = new File("/Users/redmarwoest/course-prints/templates/cp-canvas__horizontal__400x500.ai");
       if (!file.exists) { throw new Error("Template file does not exist: " + file.fsName); }
       var doc = app.open(file);
 
@@ -35,22 +35,22 @@
         return rect;
       }
 
-      var textColor = makeRGB(0,0,0);
+      var textColor = makeRGB(255,255,255);
       var extraTitleColor = makeRGB(154,126,46);
-      var backgroundColor = makeRGB(255,255,255);
+      var backgroundColor = makeRGB(180,179,168);
       var outlineInnerColor = makeRGB(154,154,154);
-      var outlineOuterColor = makeRGB(0,0,0);
-      var compassColor = makeRGB(136,136,136);
+      var outlineOuterColor = makeRGB(35,31,32);
+      var compassColor = makeRGB(255,255,255);
 
       var textLayer = doc.layers.getByName("text");
       if (textLayer) {
-        textLayer.textFrames[0].contents = "Kennemer Golf & Country Club";
+        textLayer.textFrames[0].contents = "Amsterdamse Golf Club haaha";
         textLayer.textFrames[0].textRange.fillColor = textColor;
-        textLayer.textFrames[1].contents = "Zandvoort, Netherlands";
+        textLayer.textFrames[1].contents = "Amsterdam, Netherlands";
         textLayer.textFrames[1].textRange.fillColor = textColor;
-        textLayer.textFrames[2].contents = "December 12, 2028";
+        textLayer.textFrames[2].contents = "October 15, 2025";
         textLayer.textFrames[2].textRange.fillColor = textColor;
-        textLayer.textFrames[3].contents = "2134134252345";
+        textLayer.textFrames[3].contents = "123123";
         textLayer.textFrames[3].textRange.fillColor = extraTitleColor;
       }
 
@@ -138,7 +138,7 @@
       var selectedScorecardLayer = "";
       if (showScorecard) {
         var holeCount = 18;
-        var userScores = [1,2,3,4,3,2,1,3,4,5,6,7,5,3,7,3,2,1];
+        var userScores = [2,11,3,5,6,5,4,3,2,1,2,3,4,5,6,5,4,3];
         var hasUserScores = userScores.length > 0;
         if (holeCount <= 9) {
           selectedScorecardLayer = scorecardPosition === "left" ? "scorecard9Left" : "scorecard9Right";
@@ -156,8 +156,8 @@
       try {
         var scorecardLayer = doc.layers.getByName(selectedScorecardLayer);
         if (scorecardLayer) {
-          var courseData = [{"holeNumber":1,"par":4,"black":0,"blue":334,"white":398,"yellow":364,"red":315,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":2,"par":5,"black":0,"blue":446,"white":517,"yellow":476,"red":418,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":3,"par":3,"black":0,"blue":132,"white":139,"yellow":132,"red":121,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":4,"par":4,"black":0,"blue":258,"white":366,"yellow":317,"red":258,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":5,"par":4,"black":0,"blue":335,"white":386,"yellow":354,"red":306,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":6,"par":4,"black":0,"blue":326,"white":330,"yellow":326,"red":311,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":7,"par":5,"black":0,"blue":456,"white":513,"yellow":477,"red":389,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":8,"par":3,"black":0,"blue":160,"white":204,"yellow":160,"red":144,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":9,"par":4,"black":0,"blue":345,"white":380,"yellow":345,"red":308,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":10,"par":4,"black":0,"blue":334,"white":398,"yellow":364,"red":315,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":11,"par":5,"black":0,"blue":446,"white":517,"yellow":476,"red":418,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":12,"par":3,"black":0,"blue":132,"white":139,"yellow":132,"red":121,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":13,"par":4,"black":0,"blue":258,"white":366,"yellow":317,"red":258,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":14,"par":4,"black":0,"blue":335,"white":386,"yellow":354,"red":306,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":15,"par":4,"black":0,"blue":326,"white":330,"yellow":326,"red":311,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":16,"par":5,"black":0,"blue":456,"white":513,"yellow":477,"red":389,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":17,"par":3,"black":0,"blue":160,"white":204,"yellow":160,"red":144,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":18,"par":4,"black":0,"blue":345,"white":380,"yellow":345,"red":308,"gold":0,"green":0,"purple":0,"orange":0,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null}];
-          var userScores = [1,2,3,4,3,2,1,3,4,5,6,7,5,3,7,3,2,1];
+          var courseData = [{"holeNumber":1,"par":4,"black":0,"blue":331,"white":354,"yellow":342,"red":269,"gold":0,"green":0,"purple":0,"orange":223,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":2,"par":3,"black":0,"blue":160,"white":177,"yellow":168,"red":152,"gold":0,"green":0,"purple":0,"orange":123,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":3,"par":5,"black":0,"blue":413,"white":507,"yellow":473,"red":404,"gold":0,"green":0,"purple":0,"orange":314,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":4,"par":4,"black":0,"blue":326,"white":389,"yellow":374,"red":316,"gold":0,"green":0,"purple":0,"orange":241,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":5,"par":5,"black":0,"blue":406,"white":481,"yellow":462,"red":398,"gold":0,"green":0,"purple":0,"orange":318,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":6,"par":3,"black":0,"blue":130,"white":153,"yellow":132,"red":114,"gold":0,"green":0,"purple":0,"orange":81,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":7,"par":4,"black":0,"blue":314,"white":362,"yellow":336,"red":278,"gold":0,"green":0,"purple":0,"orange":223,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":8,"par":4,"black":0,"blue":303,"white":322,"yellow":313,"red":264,"gold":0,"green":0,"purple":0,"orange":211,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":9,"par":4,"black":0,"blue":282,"white":296,"yellow":290,"red":244,"gold":0,"green":0,"purple":0,"orange":175,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":10,"par":4,"black":0,"blue":317,"white":332,"yellow":326,"red":290,"gold":0,"green":0,"purple":0,"orange":233,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":11,"par":3,"black":0,"blue":167,"white":185,"yellow":177,"red":157,"gold":0,"green":0,"purple":0,"orange":124,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":12,"par":4,"black":0,"blue":287,"white":361,"yellow":334,"red":278,"gold":0,"green":0,"purple":0,"orange":223,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":13,"par":4,"black":0,"blue":342,"white":401,"yellow":392,"red":331,"gold":0,"green":0,"purple":0,"orange":272,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":14,"par":5,"black":0,"blue":415,"white":488,"yellow":480,"red":407,"gold":0,"green":0,"purple":0,"orange":319,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":15,"par":3,"black":0,"blue":159,"white":161,"yellow":157,"red":137,"gold":0,"green":0,"purple":0,"orange":108,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":16,"par":4,"black":0,"blue":317,"white":393,"yellow":364,"red":309,"gold":0,"green":0,"purple":0,"orange":243,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":17,"par":4,"black":0,"blue":309,"white":384,"yellow":359,"red":302,"gold":0,"green":0,"purple":0,"orange":242,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":18,"par":5,"black":0,"blue":430,"white":451,"yellow":442,"red":393,"gold":0,"green":0,"purple":0,"orange":329,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null}];
+          var userScores = [2,11,3,5,6,5,4,3,2,1,2,3,4,5,6,5,4,3];
           var frontNineParTotal = 0, backNineParTotal = 0, overallParTotal = 0;
           var frontNineDistanceTotal = 0, backNineDistanceTotal = 0, overallDistanceTotal = 0;
           var frontNineScoreTotal = 0, backNineScoreTotal = 0, overallScoreTotal = 0;
@@ -325,7 +325,7 @@
       } catch(e) {}
 
       // Paste recolored SVG into map placeholder
-      var svgFile = new File("/Users/redmarwoest/Documents/selected-course-map.svg");
+      var svgFile = new File("/Users/redmarwoest/cp-automation-script/temp/selected-course-map.svg");
       var svgDoc = app.open(svgFile);
       svgDoc.selection = null; svgDoc.selectObjectsOnActiveArtboard(); app.copy();
       svgDoc.close(SaveOptions.DONOTSAVECHANGES);
@@ -379,7 +379,7 @@
 
       var exportFolder = Folder("/Users/redmarwoest/course-prints/exports");
       if (!exportFolder.exists) { exportFolder.create(); }
-      var exportFile = new File(exportFolder.fsName + "/ORDER_order-1760772438217-sjhgwg_Kennemer_Golf___Country_Club_poster.pdf");
+      var exportFile = new File(exportFolder.fsName + "/ORDER_order-1760871723308-z4zc73_Amsterdamse_Golf_Club_haaha_poster.pdf");
 
       var saveOptions = new PDFSaveOptions();
       saveOptions.compatibility = PDFCompatibility.ACROBAT5;

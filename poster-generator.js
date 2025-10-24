@@ -5,24 +5,66 @@
 
 const fs = require("fs");
 const path = require("path");
-const { exec } = require("child_process");
+const { execFile } = require("child_process");
 const { JSDOM } = require("jsdom");
 const { uploadToGoogleDrive } = require("./google-drive");
 const { colorSchemes } = require("./color-schemes");
 
-/**
- * Run Adobe Illustrator script
- */
 function runIllustratorScript(jsxPath) {
   return new Promise((resolve, reject) => {
-    const command = `osascript -e 'tell application "Adobe Illustrator" to do javascript POSIX file "${jsxPath}"'`;
-    exec(command, (error, stdout) => {
-      if (error) return reject(error);
-      resolve({ stdout });
-    });
+    const appleScript = `
+      on run argv
+        set jsxPOSIX to item 1 of argv
+        try
+          do shell script "echo [RunAI] argv=" & quoted form of jsxPOSIX
+          
+          -- confirm file exists
+          set existsJSX to do shell script "test -f " & quoted form of jsxPOSIX & " && echo 1 || echo 0"
+          if existsJSX is "0" then error "JSX not found: " & jsxPOSIX number -43
+          
+          set jsxFile to POSIX file jsxPOSIX
+          
+          -- Check if Illustrator is running, if not launch it
+          set aiRunning to false
+          try
+            tell application "System Events"
+              set aiRunning to (name of processes) contains "Adobe Illustrator"
+            end tell
+          end try
+          
+          if not aiRunning then
+            do shell script "echo [RunAI] Launching Illustrator..."
+            tell application id "com.adobe.illustrator"
+              launch
+              delay 3 -- Wait for Illustrator to fully launch
+            end tell
+          end if
+          
+          -- Now run the script
+          tell application id "com.adobe.illustrator"
+            activate
+            delay 1 -- Give Illustrator time to activate
+            do javascript file jsxFile
+          end tell
+          
+          do shell script "echo [RunAI] success for " & quoted form of jsxPOSIX
+        on error errMsg number errNum
+          do shell script "echo [RunAI] ERROR " & errNum & ": " & quoted form of errMsg & " 1>&2"
+          error errMsg number errNum
+        end try
+      end run
+    `;
+    
+    execFile(
+      "/usr/bin/osascript",
+      ["-e", appleScript, jsxPath],
+      (error, stdout, stderr) => {
+        if (error) return reject(error);
+        resolve({ stdout, stderr });
+      }
+    );
   });
 }
-
 /**
  * Generate poster using Adobe Illustrator and upload to Google Drive
  */
@@ -119,14 +161,20 @@ async function generatePoster(queueItem) {
     const compassRGB = hexToRgb(colorSchemeData.compassColor);
     const fileName = `cp-canvas__${isHorizontal ? "horizontal" : "vertical"}__${formattedSize}.ai`;
 
-    const templatePath = `/Users/redmarwoest/Documents/${fileName}`;
+    const templatePath = `/Users/redmarwoest/course-prints/templates/${fileName}`;
     if (!fs.existsSync(templatePath)) {
       throw new Error(`Template file does not exist: ${templatePath}`);
     }
 
     const svgPath = path.resolve(
-      "/Users/redmarwoest/Documents/selected-course-map.svg"
+      "/Users/redmarwoest/cp-automation-script/temp/selected-course-map.svg"
     );
+
+    // Ensure temp directory exists
+    const tempDir = path.dirname(svgPath);
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
 
     // Decode base64 data URL if needed (using the working approach)
     const decodeBase64DataURL = (dataURL) => {
@@ -222,7 +270,7 @@ async function generatePoster(queueItem) {
     
     // Create JSX script (exact same as generate-poster)
     const jsxContent = `
-      var file = new File("/Users/redmarwoest/Documents/${fileName}");
+      var file = new File("/Users/redmarwoest/course-prints/templates/${fileName}");
       if (!file.exists) { throw new Error("Template file does not exist: " + file.fsName); }
       var doc = app.open(file);
 
@@ -548,7 +596,7 @@ async function generatePoster(queueItem) {
       } catch(e) {}
 
       // Paste recolored SVG into map placeholder
-      var svgFile = new File("/Users/redmarwoest/Documents/selected-course-map.svg");
+      var svgFile = new File("/Users/redmarwoest/cp-automation-script/temp/selected-course-map.svg");
       var svgDoc = app.open(svgFile);
       svgDoc.selection = null; svgDoc.selectObjectsOnActiveArtboard(); app.copy();
       svgDoc.close(SaveOptions.DONOTSAVECHANGES);
@@ -627,6 +675,9 @@ async function generatePoster(queueItem) {
 
     console.log("🚀 Running Adobe Illustrator script...");
     const { stdout } = await runIllustratorScript(jsxPath);
+    if (stdout) console.log("RunAI stdout:\n" + stdout);
+
+    console.log("🧭 JSX path:", jsxPath);
 
     const localPosterPath = `/Users/redmarwoest/course-prints/exports/${posterFileName}`;
     console.log("✅ Poster generated successfully");
