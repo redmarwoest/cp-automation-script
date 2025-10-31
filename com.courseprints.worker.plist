@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.courseprints.worker</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/redmarwoest/.nvm/versions/node/v25.0.0/bin/node</string>
+    <string>/Users/redmarwoest/cp-automation-script/index.js</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <!-- Keep the Mac awake while this agent is alive -->
+  <key>ProcessType</key>
+  <string>Interactive</string>
+  <key>ThrottleInterval</key>
+  <integer>3</integer>
+  <key>StandardOutPath</key>
+  <string>/Users/redmarwoest/Library/Logs/courseprints.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/redmarwoest/Library/Logs/courseprints.err.log</string>
+</dict>
+</plist>

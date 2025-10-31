@@ -10,6 +10,9 @@ const { JSDOM } = require("jsdom");
 const { uploadToGoogleDrive } = require("./google-drive");
 const { colorSchemes } = require("./color-schemes");
 
+// Get the project root directory
+const PROJECT_ROOT = __dirname;
+
 function runIllustratorScript(jsxPath) {
   return new Promise((resolve, reject) => {
     const appleScript = `
@@ -666,7 +669,7 @@ async function generatePoster(queueItem) {
     `;
 
     // Write JSX script and run it
-    const jsxPath = path.resolve("./scripts/generatePoster.jsx");
+    const jsxPath = path.join(PROJECT_ROOT, "scripts", "generatePoster.jsx");
     const scriptsDir = path.dirname(jsxPath);
     if (!fs.existsSync(scriptsDir)) {
       fs.mkdirSync(scriptsDir, { recursive: true });
