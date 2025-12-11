@@ -6,8 +6,8 @@
   <string>com.courseprints.worker</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/Users/redmarwoest/.nvm/versions/node/v25.0.0/bin/node</string>
-    <string>/Users/redmarwoest/cp-automation-script/index.js</string>
+    <string>/bin/zsh</string>
+    <string>/Users/redmarwoest/cp-automation-script/scripts/launch-worker.sh</string>
   </array>
   <key>EnvironmentVariables</key>
   <dict>
@@ -21,11 +21,19 @@
   <!-- Keep the Mac awake while this agent is alive -->
   <key>ProcessType</key>
   <string>Interactive</string>
+  <key>WorkingDirectory</key>
+  <string>/Users/redmarwoest/cp-automation-script</string>
+  <key>LimitLoadToSessionType</key>
+  <string>Aqua</string>
   <key>ThrottleInterval</key>
   <integer>3</integer>
   <key>StandardOutPath</key>
   <string>/Users/redmarwoest/Library/Logs/courseprints.out.log</string>
   <key>StandardErrorPath</key>
   <string>/Users/redmarwoest/Library/Logs/courseprints.err.log</string>
+  <key>LimitLoadToSessionType</key>
+  <string>Aqua</string>
+  <key>WorkingDirectory</key>
+  <string>/Users/redmarwoest/cp-automation-script</string>
 </dict>
 </plist>
