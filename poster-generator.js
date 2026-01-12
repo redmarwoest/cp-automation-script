@@ -110,7 +110,9 @@ async function generatePoster(queueItem) {
       underTitle,
       scores,
       scorecard,
-      selectedCourseMap, 
+      selectedCourseMap,
+      svgMapSizeHorizontal,
+      svgMapSizeVertical,
     } = customizationData;
 
     // Prioritize scorecard field from PosterQueueData interface, fallback to legacy courseData
@@ -132,6 +134,10 @@ async function generatePoster(queueItem) {
       console.log(`   🔍 Scores: ${scores ? scores.length : 0} scores`);
       console.log(`   🔍 Scorecard: ${scorecard ? scorecard.length : 0} holes`);
       console.log(`   🔍 Course Data: ${courseData.length} holes (${scorecard && scorecard.length > 0 ? 'from scorecard' : 'from legacy courseData'})`);
+      
+      // Determine which SVG map size to use based on orientation
+      const svgMapSize = isHorizontal ? svgMapSizeHorizontal : svgMapSizeVertical;
+      console.log(`   🔍 SVG Map Size (${isHorizontal ? 'Horizontal' : 'Vertical'}): ${svgMapSize || 'default (100%)'}`);
     
 
     // Format size (exact same logic as generate-poster)
@@ -318,14 +324,32 @@ async function generatePoster(queueItem) {
 
       var textLayer = doc.layers.getByName("text");
       if (textLayer) {
+        // Set text contents - JSON.stringify properly escapes quotes and preserves Unicode characters
+        // The JSX file is saved with UTF-8 encoding, so Unicode characters should render correctly
         textLayer.textFrames[0].contents = ${JSON.stringify(title || "")};
         textLayer.textFrames[0].textRange.fillColor = textColor;
+        // Disable All Caps / Small Caps to preserve original capitalization
+        try {
+          textLayer.textFrames[0].textRange.characterAttributes.capitalization = TextCase.NORMAL;
+        } catch(e) {}
+        
         textLayer.textFrames[1].contents = ${JSON.stringify(subTitle || "")};
         textLayer.textFrames[1].textRange.fillColor = textColor;
+        try {
+          textLayer.textFrames[1].textRange.characterAttributes.capitalization = TextCase.NORMAL;
+        } catch(e) {}
+        
         textLayer.textFrames[2].contents = ${JSON.stringify(underTitle || "")};
         textLayer.textFrames[2].textRange.fillColor = textColor;
+        try {
+          textLayer.textFrames[2].textRange.characterAttributes.capitalization = TextCase.NORMAL;
+        } catch(e) {}
+        
         textLayer.textFrames[3].contents = ${JSON.stringify(extraTitle || "")};
         textLayer.textFrames[3].textRange.fillColor = extraTitleColor;
+        try {
+          textLayer.textFrames[3].textRange.characterAttributes.capitalization = TextCase.NORMAL;
+        } catch(e) {}
       }
 
       try { doc.pageItems.getByName("background").fillColor = backgroundColor; } catch(e) {}
@@ -374,10 +398,10 @@ async function generatePoster(queueItem) {
       var navigationPosition = "${navigationPosition}";
       var compassLeftLayer = doc.layers.getByName("compasLeft");
       var compassRightLayer = doc.layers.getByName("compasRight");
-      if (compassLeftLayer) compassLeftLayer.visible = (navigationPosition === "right");
-      if (compassRightLayer) compassRightLayer.visible = (navigationPosition === "left");
+      if (compassLeftLayer) compassLeftLayer.visible = (navigationPosition === "left");
+      if (compassRightLayer) compassRightLayer.visible = (navigationPosition === "right");
 
-      var compassLayerName = navigationPosition === "right" ? "compasLeft" : "compasRight";
+      var compassLayerName = navigationPosition === "right" ? "compasRight" : "compasLeft";
       var compassLayer = doc.layers.getByName(compassLayerName);
       if (compassLayer) {
         for (var i = 0; i < compassLayer.compoundPathItems.length; i++) {
@@ -646,6 +670,33 @@ async function generatePoster(queueItem) {
               var centerX = mapElementCenterX - (newWidth / 2);
               var centerY = mapElementCenterY + (newHeight / 2);
               groupedMap.position = [centerX, centerY];
+
+              // Apply svgMapSize scaling if provided (scale from center)
+              // Use horizontal size if orientation is horizontal, vertical size otherwise
+              var isHorizontal = ${isHorizontal};
+              var svgMapSizeHorizontal = ${svgMapSizeHorizontal ? parseFloat(svgMapSizeHorizontal) : 'null'};
+              var svgMapSizeVertical = ${svgMapSizeVertical ? parseFloat(svgMapSizeVertical) : 'null'};
+              var svgMapSize = isHorizontal ? svgMapSizeHorizontal : svgMapSizeVertical;
+              if (svgMapSize !== null && svgMapSize > 0 && svgMapSize <= 100) {
+                var scaleFactor = svgMapSize / 100;
+                
+                // Get current center point before scaling
+                var currentBounds = groupedMap.geometricBounds;
+                var currentCenterX = (currentBounds[0] + currentBounds[2]) / 2;
+                var currentCenterY = (currentBounds[1] + currentBounds[3]) / 2;
+                
+                // Scale the map
+                groupedMap.resize(scaleFactor * 100, scaleFactor * 100);
+                
+                // Re-center after scaling to maintain the same center point
+                var scaledBounds = groupedMap.geometricBounds;
+                var scaledWidth = scaledBounds[2] - scaledBounds[0];
+                var scaledHeight = scaledBounds[1] - scaledBounds[3];
+                
+                var finalCenterX = currentCenterX - (scaledWidth / 2);
+                var finalCenterY = currentCenterY + (scaledHeight / 2);
+                groupedMap.position = [finalCenterX, finalCenterY];
+              }
             }
           } catch(e) {}
         }
@@ -674,7 +725,10 @@ async function generatePoster(queueItem) {
     if (!fs.existsSync(scriptsDir)) {
       fs.mkdirSync(scriptsDir, { recursive: true });
     }
-    fs.writeFileSync(jsxPath, jsxContent);
+    // Write with explicit UTF-8 encoding and BOM to help Illustrator recognize the encoding
+    // This ensures special characters like ö, ä, ü are properly interpreted
+    const BOM = '\uFEFF';
+    fs.writeFileSync(jsxPath, BOM + jsxContent, 'utf8');
 
     console.log("🚀 Running Adobe Illustrator script...");
     const { stdout } = await runIllustratorScript(jsxPath);

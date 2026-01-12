@@ -1,5 +1,5 @@
-
-      var file = new File("/Users/redmarwoest/course-prints/templates/cp-canvas__vertical__400x500.ai");
+﻿
+      var file = new File("/Users/redmarwoest/course-prints/templates/cp-canvas__horizontal__210x297.ai");
       if (!file.exists) { throw new Error("Template file does not exist: " + file.fsName); }
       var doc = app.open(file);
 
@@ -44,14 +44,32 @@
 
       var textLayer = doc.layers.getByName("text");
       if (textLayer) {
-        textLayer.textFrames[0].contents = "U.G.C. 'De Pan'";
+        // Set text contents - JSON.stringify properly escapes quotes and preserves Unicode characters
+        // The JSX file is saved with UTF-8 encoding, so Unicode characters should render correctly
+        textLayer.textFrames[0].contents = "Royal Zoute Golf Club";
         textLayer.textFrames[0].textRange.fillColor = textColor;
-        textLayer.textFrames[1].contents = "Bosch en Duin, Netherlands";
+        // Disable All Caps / Small Caps to preserve original capitalization
+        try {
+          textLayer.textFrames[0].textRange.characterAttributes.capitalization = TextCase.NORMAL;
+        } catch(e) {}
+        
+        textLayer.textFrames[1].contents = "Belgium";
         textLayer.textFrames[1].textRange.fillColor = textColor;
-        textLayer.textFrames[2].contents = "Est. 1894";
+        try {
+          textLayer.textFrames[1].textRange.characterAttributes.capitalization = TextCase.NORMAL;
+        } catch(e) {}
+        
+        textLayer.textFrames[2].contents = "Est. 1899";
         textLayer.textFrames[2].textRange.fillColor = textColor;
-        textLayer.textFrames[3].contents = "Hole-in-one Peter Meijer 22-05-2022";
+        try {
+          textLayer.textFrames[2].textRange.characterAttributes.capitalization = TextCase.NORMAL;
+        } catch(e) {}
+        
+        textLayer.textFrames[3].contents = "Championship Course";
         textLayer.textFrames[3].textRange.fillColor = extraTitleColor;
+        try {
+          textLayer.textFrames[3].textRange.characterAttributes.capitalization = TextCase.NORMAL;
+        } catch(e) {}
       }
 
       try { doc.pageItems.getByName("background").fillColor = backgroundColor; } catch(e) {}
@@ -97,13 +115,13 @@
         }
       }
 
-      var navigationPosition = "left";
+      var navigationPosition = "right";
       var compassLeftLayer = doc.layers.getByName("compasLeft");
       var compassRightLayer = doc.layers.getByName("compasRight");
-      if (compassLeftLayer) compassLeftLayer.visible = (navigationPosition === "right");
-      if (compassRightLayer) compassRightLayer.visible = (navigationPosition === "left");
+      if (compassLeftLayer) compassLeftLayer.visible = (navigationPosition === "left");
+      if (compassRightLayer) compassRightLayer.visible = (navigationPosition === "right");
 
-      var compassLayerName = navigationPosition === "right" ? "compasLeft" : "compasRight";
+      var compassLayerName = navigationPosition === "right" ? "compasRight" : "compasLeft";
       var compassLayer = doc.layers.getByName(compassLayerName);
       if (compassLayer) {
         for (var i = 0; i < compassLayer.compoundPathItems.length; i++) {
@@ -119,8 +137,8 @@
         }
       }
       
-      var scorecardPosition = "right";
-      var showScorecard = true;
+      var scorecardPosition = "left";
+      var showScorecard = false;
 
       var scorecardLayers = [
         "scorecard9Left", "scorecard9Right",
@@ -138,7 +156,7 @@
       var selectedScorecardLayer = "";
       if (showScorecard) {
         var holeCount = 18;
-        var userScores = [6,5,3,5,6,5,5,1,5,6,5,4,6,3,3,5,6,6];
+        var userScores = [];
         var hasUserScores = userScores.length > 0;
         if (holeCount <= 9) {
           selectedScorecardLayer = scorecardPosition === "left" ? "scorecard9Left" : "scorecard9Right";
@@ -156,8 +174,8 @@
       try {
         var scorecardLayer = doc.layers.getByName(selectedScorecardLayer);
         if (scorecardLayer) {
-          var courseData = [{"holeNumber":1,"par":5,"black":0,"blue":426,"white":443,"yellow":438,"red":376,"gold":0,"green":0,"purple":0,"orange":376,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":2,"par":4,"black":0,"blue":320,"white":367,"yellow":343,"red":311,"gold":0,"green":0,"purple":0,"orange":311,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":3,"par":3,"black":0,"blue":136,"white":158,"yellow":153,"red":119,"gold":0,"green":0,"purple":0,"orange":119,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":4,"par":4,"black":0,"blue":328,"white":395,"yellow":341,"red":290,"gold":0,"green":0,"purple":0,"orange":290,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":5,"par":5,"black":0,"blue":432,"white":485,"yellow":454,"red":392,"gold":0,"green":0,"purple":0,"orange":392,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":6,"par":4,"black":0,"blue":317,"white":391,"yellow":362,"red":313,"gold":0,"green":0,"purple":0,"orange":313,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":7,"par":4,"black":0,"blue":273,"white":304,"yellow":280,"red":244,"gold":0,"green":0,"purple":0,"orange":244,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":8,"par":3,"black":0,"blue":172,"white":196,"yellow":181,"red":150,"gold":0,"green":0,"purple":0,"orange":125,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":9,"par":4,"black":0,"blue":306,"white":390,"yellow":346,"red":291,"gold":0,"green":0,"purple":0,"orange":291,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":10,"par":4,"black":0,"blue":301,"white":339,"yellow":308,"red":277,"gold":0,"green":0,"purple":0,"orange":222,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":11,"par":5,"black":0,"blue":392,"white":459,"yellow":452,"red":384,"gold":0,"green":0,"purple":0,"orange":384,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":12,"par":3,"black":0,"blue":151,"white":174,"yellow":163,"red":115,"gold":0,"green":0,"purple":0,"orange":115,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":13,"par":4,"black":0,"blue":348,"white":409,"yellow":372,"red":320,"gold":0,"green":0,"purple":0,"orange":320,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":14,"par":4,"black":0,"blue":304,"white":325,"yellow":319,"red":280,"gold":0,"green":0,"purple":0,"orange":280,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":15,"par":3,"black":0,"blue":141,"white":161,"yellow":146,"red":127,"gold":0,"green":0,"purple":0,"orange":127,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":16,"par":4,"black":0,"blue":314,"white":340,"yellow":333,"red":311,"gold":0,"green":0,"purple":0,"orange":311,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":17,"par":4,"black":0,"blue":268,"white":291,"yellow":276,"red":245,"gold":0,"green":0,"purple":0,"orange":205,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null},{"holeNumber":18,"par":5,"black":0,"blue":418,"white":470,"yellow":449,"red":390,"gold":0,"green":0,"purple":0,"orange":352,"silver":0,"si":null,"ladiesPar":null,"ladiesSi":null}];
-          var userScores = [6,5,3,5,6,5,5,1,5,6,5,4,6,3,3,5,6,6];
+          var courseData = [{"hole":1,"par":4,"si":null,"white":396,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":2,"par":4,"si":null,"white":358,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":3,"par":3,"si":null,"white":135,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":4,"par":4,"si":null,"white":355,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":5,"par":5,"si":null,"white":435,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":6,"par":4,"si":null,"white":373,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":7,"par":4,"si":null,"white":346,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":8,"par":3,"si":null,"white":186,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":9,"par":4,"si":null,"white":389,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":10,"par":4,"si":null,"white":350,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":11,"par":3,"si":null,"white":160,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":12,"par":5,"si":null,"white":482,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":13,"par":4,"si":null,"white":433,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":14,"par":4,"si":null,"white":337,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":15,"par":5,"si":null,"white":461,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":16,"par":3,"si":null,"white":165,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":17,"par":5,"si":null,"white":501,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":18,"par":4,"si":null,"white":379,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null}];
+          var userScores = [];
           var frontNineParTotal = 0, backNineParTotal = 0, overallParTotal = 0;
           var frontNineDistanceTotal = 0, backNineDistanceTotal = 0, overallDistanceTotal = 0;
           var frontNineScoreTotal = 0, backNineScoreTotal = 0, overallScoreTotal = 0;
@@ -372,6 +390,33 @@
               var centerX = mapElementCenterX - (newWidth / 2);
               var centerY = mapElementCenterY + (newHeight / 2);
               groupedMap.position = [centerX, centerY];
+
+              // Apply svgMapSize scaling if provided (scale from center)
+              // Use horizontal size if orientation is horizontal, vertical size otherwise
+              var isHorizontal = true;
+              var svgMapSizeHorizontal = null;
+              var svgMapSizeVertical = null;
+              var svgMapSize = isHorizontal ? svgMapSizeHorizontal : svgMapSizeVertical;
+              if (svgMapSize !== null && svgMapSize > 0 && svgMapSize <= 100) {
+                var scaleFactor = svgMapSize / 100;
+                
+                // Get current center point before scaling
+                var currentBounds = groupedMap.geometricBounds;
+                var currentCenterX = (currentBounds[0] + currentBounds[2]) / 2;
+                var currentCenterY = (currentBounds[1] + currentBounds[3]) / 2;
+                
+                // Scale the map
+                groupedMap.resize(scaleFactor * 100, scaleFactor * 100);
+                
+                // Re-center after scaling to maintain the same center point
+                var scaledBounds = groupedMap.geometricBounds;
+                var scaledWidth = scaledBounds[2] - scaledBounds[0];
+                var scaledHeight = scaledBounds[1] - scaledBounds[3];
+                
+                var finalCenterX = currentCenterX - (scaledWidth / 2);
+                var finalCenterY = currentCenterY + (scaledHeight / 2);
+                groupedMap.position = [finalCenterX, finalCenterY];
+              }
             }
           } catch(e) {}
         }
@@ -379,7 +424,7 @@
 
       var exportFolder = Folder("/Users/redmarwoest/course-prints/exports");
       if (!exportFolder.exists) { exportFolder.create(); }
-      var exportFile = new File(exportFolder.fsName + "/ORDER_order-1765359344232-atjhfq_U_G_C___De_Pan__poster.pdf");
+      var exportFile = new File(exportFolder.fsName + "/ORDER_order-1767859299788-7y56co_Royal_Zoute_Golf_Club_poster.pdf");
 
       var saveOptions = new PDFSaveOptions();
       saveOptions.compatibility = PDFCompatibility.ACROBAT5;
