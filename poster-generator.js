@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 const { execFile } = require("child_process");
 const { JSDOM } = require("jsdom");
-const { uploadToGoogleDrive } = require("./google-drive");
+const { uploadToBunnyCDN } = require("./bunnycdn");
 const { colorSchemes } = require("./color-schemes");
 
 // Get the project root directory
@@ -69,7 +69,7 @@ function runIllustratorScript(jsxPath) {
   });
 }
 /**
- * Generate poster using Adobe Illustrator and upload to Google Drive
+ * Generate poster using Adobe Illustrator
  */
 async function generatePoster(queueItem) {
   console.log(`🎨 Generating poster for order: ${queueItem.orderId}`);
@@ -274,8 +274,10 @@ async function generatePoster(queueItem) {
       fs.writeFileSync(svgPath, selectedCourseMap);
     }
 
-    // Create dynamic filename with order ID
-    const posterFileName = `ORDER_${queueItem.orderId}_${title.replace(/[^a-zA-Z0-9]/g, '_')}_poster.pdf`;
+    // Create dynamic filename with order ID and timestamp to ensure uniqueness and avoid CDN caching issues
+    const timestamp = Date.now();
+    const sanitizedTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
+    const posterFileName = `ORDER_${queueItem.orderId}_${sanitizedTitle}_${timestamp}_poster.pdf`;
     
     // Create JSX script (exact same as generate-poster)
     const jsxContent = `
@@ -740,13 +742,14 @@ async function generatePoster(queueItem) {
     console.log("✅ Poster generated successfully");
     console.log(`📄 Local file: ${localPosterPath}`);
 
-    // Upload to Google Drive
-    let driveUploadResult = null;
+    // Upload to BunnyCDN Storage
+    let bunnyCDNResult = null;
     try {
-      driveUploadResult = await uploadToGoogleDrive(localPosterPath, posterFileName, queueItem.orderId);
-      console.log("✅ Google Drive upload completed successfully");
+      const remotePath = `posters/${queueItem.orderId}/${posterFileName}`;
+      bunnyCDNResult = await uploadToBunnyCDN(localPosterPath, remotePath);
+      console.log("✅ BunnyCDN upload completed successfully");
     } catch (error) {
-      console.error("⚠️ Google Drive upload failed, but poster was created locally:", error.message);
+      console.error("⚠️ BunnyCDN upload failed, but poster was created locally:", error.message);
       // Continue execution - local file is still available
     }
 
@@ -754,7 +757,7 @@ async function generatePoster(queueItem) {
       success: true,
       posterPath: localPosterPath,
       fileName: posterFileName,
-      driveFile: driveUploadResult,
+      bunnyCDN: bunnyCDNResult,
       stdout,
     };
   } catch (error) {

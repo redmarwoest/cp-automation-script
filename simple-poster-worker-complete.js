@@ -1,6 +1,5 @@
 const { generatePoster } = require("./poster-generator");
 
-
 const CONFIG = {
   API_URL: "https://course-prints-store.vercel.app",
   POLL_INTERVAL: parseInt(process.env.POLL_INTERVAL) || 30000, // 30 seconds
@@ -60,17 +59,32 @@ async function markQueueItemProcessing(queueId) {
   }
 }
 
-async function markQueueItemCompleted(queueId, posterPath, additionalData = null) {
+async function markQueueItemCompleted(queueId, posterPath, fileName, bunnyCDNResult = null, orderId = null, merchandiseId = null) {
   try {
+    // Build request data object - explicitly include all fields
     const requestData = {
-      queueId,
-      posterPath,
+      queueId: queueId,
+      posterPath: posterPath,
+      fileName: fileName,
+      downloadLink: bunnyCDNResult?.downloadLink || null,  // Explicitly set downloadLink (null if not available)
+      orderId: orderId || null,
+      merchandiseId: merchandiseId || null,
     };
 
-    if (additionalData?.driveFile) {
-      requestData.driveFile = additionalData.driveFile;
+    // Add BunnyCDN result object if available
+    if (bunnyCDNResult) {
+      requestData.bunnyCDN = bunnyCDNResult;
     }
 
+    // Log what we're sending
+    if (requestData.downloadLink) {
+      log("info", `📤 Including BunnyCDN download link in API request: ${requestData.downloadLink}`);
+    } else {
+      log("warn", `⚠️ No BunnyCDN download link available (upload failed or not configured)`);
+      log("warn", `⚠️ Sending downloadLink as null - API should handle this gracefully`);
+    }
+
+    log("info", `📤 Sending completion request to API with data:`, JSON.stringify(requestData, null, 2));
     await makeQueueRequest("complete", requestData);
     return true;
   } catch (error) {
@@ -107,13 +121,8 @@ async function processQueueItem(queueItem) {
       throw new Error(result.error || "Poster generation failed");
     }
 
-    // Mark as completed with results
-    const completionData = {
-      posterPath: result.posterPath,
-      driveFile: result.driveFile
-    };
-    
-    const marked = await markQueueItemCompleted(queueId, result.posterPath, completionData);
+    // Mark as completed with results (file uploaded to BunnyCDN)
+    const marked = await markQueueItemCompleted(queueId, result.posterPath, result.fileName, result.bunnyCDN, orderId, merchandiseId);
 
     if (!marked) {
       throw new Error("Failed to mark item as completed");
@@ -122,8 +131,11 @@ async function processQueueItem(queueItem) {
     // Log success
     log("info", `✅ Successfully completed: ${queueId}`);
     log("info", `📄 Local file: ${result.posterPath}`);
-    if (result.driveFile) {
-      log("info", `☁️ Google Drive file: ${result.driveFile.viewLink}`);
+    if (result.bunnyCDN?.downloadLink) {
+      log("info", `☁️ BunnyCDN download link: ${result.bunnyCDN.downloadLink}`);
+      log("info", `📤 Sending download link to API for order: ${orderId}`);
+    } else {
+      log("warn", `⚠️ No download link available (BunnyCDN upload may have failed)`);
     }
     
     return true;

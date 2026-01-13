@@ -1,5 +1,5 @@
 ﻿
-      var file = new File("/Users/redmarwoest/course-prints/templates/cp-canvas__horizontal__210x297.ai");
+      var file = new File("/Users/redmarwoest/course-prints/templates/cp-canvas__horizontal__400x500.ai");
       if (!file.exists) { throw new Error("Template file does not exist: " + file.fsName); }
       var doc = app.open(file);
 
@@ -46,26 +46,26 @@
       if (textLayer) {
         // Set text contents - JSON.stringify properly escapes quotes and preserves Unicode characters
         // The JSX file is saved with UTF-8 encoding, so Unicode characters should render correctly
-        textLayer.textFrames[0].contents = "Royal Zoute Golf Club";
+        textLayer.textFrames[0].contents = "Crans-sur-Sierre Golf Club";
         textLayer.textFrames[0].textRange.fillColor = textColor;
         // Disable All Caps / Small Caps to preserve original capitalization
         try {
           textLayer.textFrames[0].textRange.characterAttributes.capitalization = TextCase.NORMAL;
         } catch(e) {}
         
-        textLayer.textFrames[1].contents = "Belgium";
+        textLayer.textFrames[1].contents = "Crans-Montana, VS, Switzerland";
         textLayer.textFrames[1].textRange.fillColor = textColor;
         try {
           textLayer.textFrames[1].textRange.characterAttributes.capitalization = TextCase.NORMAL;
         } catch(e) {}
         
-        textLayer.textFrames[2].contents = "Est. 1899";
+        textLayer.textFrames[2].contents = "Est. 1906";
         textLayer.textFrames[2].textRange.fillColor = textColor;
         try {
           textLayer.textFrames[2].textRange.characterAttributes.capitalization = TextCase.NORMAL;
         } catch(e) {}
         
-        textLayer.textFrames[3].contents = "Championship Course";
+        textLayer.textFrames[3].contents = "";
         textLayer.textFrames[3].textRange.fillColor = extraTitleColor;
         try {
           textLayer.textFrames[3].textRange.characterAttributes.capitalization = TextCase.NORMAL;
@@ -138,7 +138,7 @@
       }
       
       var scorecardPosition = "left";
-      var showScorecard = false;
+      var showScorecard = true;
 
       var scorecardLayers = [
         "scorecard9Left", "scorecard9Right",
@@ -174,7 +174,7 @@
       try {
         var scorecardLayer = doc.layers.getByName(selectedScorecardLayer);
         if (scorecardLayer) {
-          var courseData = [{"hole":1,"par":4,"si":null,"white":396,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":2,"par":4,"si":null,"white":358,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":3,"par":3,"si":null,"white":135,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":4,"par":4,"si":null,"white":355,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":5,"par":5,"si":null,"white":435,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":6,"par":4,"si":null,"white":373,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":7,"par":4,"si":null,"white":346,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":8,"par":3,"si":null,"white":186,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":9,"par":4,"si":null,"white":389,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":10,"par":4,"si":null,"white":350,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":11,"par":3,"si":null,"white":160,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":12,"par":5,"si":null,"white":482,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":13,"par":4,"si":null,"white":433,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":14,"par":4,"si":null,"white":337,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":15,"par":5,"si":null,"white":461,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":16,"par":3,"si":null,"white":165,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":17,"par":5,"si":null,"white":501,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":18,"par":4,"si":null,"white":379,"yellow":null,"red":null,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null}];
+          var courseData = [{"hole":null,"par":5,"si":null,"white":475,"yellow":461,"red":444,"blue":456,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":4,"si":null,"white":394,"yellow":375,"red":337,"blue":342,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":3,"si":null,"white":158,"yellow":149,"red":133,"blue":151,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":4,"si":null,"white":445,"yellow":435,"red":374,"blue":382,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":4,"si":null,"white":314,"yellow":296,"red":230,"blue":238,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":4,"si":null,"white":284,"yellow":277,"red":251,"blue":267,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":4,"si":null,"white":294,"yellow":275,"red":232,"blue":262,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":3,"si":null,"white":153,"yellow":146,"red":128,"blue":136,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":5,"si":null,"white":553,"yellow":467,"red":454,"blue":484,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":4,"si":null,"white":352,"yellow":305,"red":300,"blue":306,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":3,"si":null,"white":163,"yellow":145,"red":137,"blue":142,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":4,"si":null,"white":359,"yellow":348,"red":300,"blue":337,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":3,"si":null,"white":162,"yellow":118,"red":109,"blue":115,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":5,"si":null,"white":533,"yellow":505,"red":432,"blue":471,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":5,"si":null,"white":483,"yellow":481,"red":390,"blue":397,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":3,"si":null,"white":172,"yellow":160,"red":241,"blue":261,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":4,"si":null,"white":351,"yellow":315,"red":309,"blue":316,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null},{"hole":null,"par":4,"si":null,"white":360,"yellow":324,"red":258,"blue":290,"orange":0,"gold":0,"black":0,"green":0,"silver":0,"brown":null,"purple":0,"ladiesPar":null,"ladiesSi":null}];
           var userScores = [];
           var frontNineParTotal = 0, backNineParTotal = 0, overallParTotal = 0;
           var frontNineDistanceTotal = 0, backNineDistanceTotal = 0, overallDistanceTotal = 0;
@@ -323,7 +323,7 @@
           for (var j = 0; j < scorecardLayer.textFrames.length; j++) {
             var frame = scorecardLayer.textFrames[j];
             if (frame.contents === "Meters") {
-              var distanceUnit = "meters";
+              var distanceUnit = "yards";
               // Handle specific cases: yards -> Yards, default to Meters
               var displayUnit;
               if (distanceUnit.toLowerCase() === "yards") {
@@ -424,7 +424,7 @@
 
       var exportFolder = Folder("/Users/redmarwoest/course-prints/exports");
       if (!exportFolder.exists) { exportFolder.create(); }
-      var exportFile = new File(exportFolder.fsName + "/ORDER_order-1767859299788-7y56co_Royal_Zoute_Golf_Club_poster.pdf");
+      var exportFile = new File(exportFolder.fsName + "/ORDER_order-1768206978763-tw60yl_Crans_sur_Sierre_Golf_Club_1768282515695_poster.pdf");
 
       var saveOptions = new PDFSaveOptions();
       saveOptions.compatibility = PDFCompatibility.ACROBAT5;

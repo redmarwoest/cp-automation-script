@@ -6,7 +6,9 @@
  */
 
 // Load environment variables from .env file
-require('dotenv').config();
+// Use explicit path to ensure .env is loaded correctly when running as a service
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const { startWorker } = require("./simple-poster-worker-complete");
 
