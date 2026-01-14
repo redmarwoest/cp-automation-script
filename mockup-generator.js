@@ -130,6 +130,7 @@ async function generateMockups(queueItem) {
       console.log(`🎨 [${i + 1}/5] Generating ${colorName} color variant with Illustrator...`);
 
       // Create a mock queue item for poster generation
+      const isHorizontal = orientation === "horizontal";
       const mockPosterQueueItem = {
         queueId: `${queueId}-${colorName.toLowerCase()}`,
         orderId: `mockup-${queueId}`,
@@ -138,14 +139,16 @@ async function generateMockups(queueItem) {
           subTitle: clubName,
           underTitle: city && state ? `${city}, ${state}` : city || state || country || "",
           selectedCourseMap: svgMap,
-          finalColorScheme: colorName,
-          orientation: orientation || "vertical",
+          selectedSize: "40 x 50 cm", // Default size matching template (400x500)
+          isHorizontal: isHorizontal,
+          color: colorName, // Use color instead of finalColorScheme
           navigationPosition: navigationPosition || "left",
           scorecardPosition: scorecardPosition || "left",
           courseData: scoreCard || [],
+          scorecard: scoreCard || [], // Also provide scorecard field
           scores: [],
           showScorecard: scoreCard && scoreCard.length > 0,
-          distanceUnit: country === "USA" ? "Yards" : "Meters",
+          distanceUnit: country === "USA" ? "yards" : "meters",
         },
       };
 
