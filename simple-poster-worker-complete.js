@@ -2,7 +2,8 @@ const { generatePoster } = require("./poster-generator");
 const { generateMockups } = require("./mockup-generator");
 
 const CONFIG = {
-  API_URL: "https://course-prints-store.vercel.app",
+  API_URL: "https://course-prints-store.vercel.app", // Commerce app (for poster_queue)
+  COURSE_PRINTS_API_URL: process.env.COURSE_PRINTS_API_URL || "https://course-prints.vercel.app", // Course-prints app (for mockup_queue)
   POLL_INTERVAL: parseInt(process.env.POLL_INTERVAL) || 30000, // 30 seconds
   MAX_RETRIES: parseInt(process.env.MAX_RETRIES) || 3,
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
@@ -28,19 +29,31 @@ async function makeQueueRequest(action, data = {}) {
 }
 
 /**
- * Make API request to mockup queue endpoint
+ * Make API request to mockup queue endpoint (uses course-prints app URL)
  */
 async function makeMockupQueueRequest(action, data = {}) {
   const requestBody = { action, ...data };
+  const url = `${CONFIG.COURSE_PRINTS_API_URL}/api/mockup-queue`;
   
-  const response = await fetch(`${CONFIG.API_URL}/api/mockup-queue`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+  log("info", `📤 POST to mockup queue: ${url} (action: ${action})`);
+  
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(requestBody),
   });
 
   if (!response.ok) {
-    throw new Error(`Mockup queue API responded with ${response.status}`);
+    const text = await response.text();
+    log("error", `Mockup queue API ${response.status} - Response: ${text.substring(0, 200)}`);
+    throw new Error(`Mockup queue API responded with ${response.status}: ${text.substring(0, 100)}`);
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    const text = await response.text();
+    log("error", `Expected JSON but got ${contentType}. Response: ${text.substring(0, 200)}`);
+    throw new Error(`Expected JSON but got ${contentType}. Check if URL is correct: ${url}`);
   }
 
   return response.json();
@@ -74,16 +87,38 @@ async function getNextQueueItem() {
 }
 
 /**
- * Get next pending item from mockup queue
+ * Get next pending item from mockup queue (uses course-prints app URL)
  */
 async function getNextMockupQueueItem() {
   try {
-    const res = await fetch(`${CONFIG.API_URL}/api/mockup-queue?action=pending`);
-    if (!res.ok) throw new Error(`Mockup queue API ${res.status}`);
+    const url = `${CONFIG.COURSE_PRINTS_API_URL}/api/mockup-queue?action=pending`;
+    log("info", `🔍 Fetching mockup queue from: ${url}`);
+    
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    
+    if (!res.ok) {
+      const text = await res.text();
+      log("error", `Mockup queue API ${res.status} - Response: ${text.substring(0, 200)}`);
+      throw new Error(`Mockup queue API ${res.status}: ${text.substring(0, 100)}`);
+    }
+    
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await res.text();
+      log("error", `Expected JSON but got ${contentType}. Response: ${text.substring(0, 200)}`);
+      throw new Error(`Expected JSON but got ${contentType}. Check if URL is correct: ${url}`);
+    }
+    
     const data = await res.json();
     return data.success && Array.isArray(data.items) && data.items.length > 0 ? data.items[0] : null;
   } catch (e) {
     log("error", "Failed to claim mockup queue item:", e.message);
+    // Log the URL being used for debugging
+    log("error", `Attempted URL: ${CONFIG.COURSE_PRINTS_API_URL}/api/mockup-queue?action=pending`);
     return null;
   }
 }
@@ -307,6 +342,8 @@ async function startWorker() {
   log("info", "🚀 Starting poster & mockup generation worker...");
   log("info", `⏱️  Polling every ${CONFIG.POLL_INTERVAL}ms`);
   log("info", `📋 Checking both poster_queue and mockup_queue`);
+  log("info", `🔗 Poster queue API: ${CONFIG.API_URL}`);
+  log("info", `🔗 Mockup queue API: ${CONFIG.COURSE_PRINTS_API_URL}`);
 
   // Run initial loop
   await workerLoop();
