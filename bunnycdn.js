@@ -21,9 +21,10 @@ const CONFIG = getConfig();
  * Upload file to BunnyCDN Storage
  * @param {string} filePath - Local path to the file
  * @param {string} remotePath - Path in storage zone (e.g., "posters/order-123.pdf")
+ * @param {string} contentType - MIME type (defaults to "application/pdf")
  * @returns {Promise<{filePath: string, downloadLink: string}>}
  */
-async function uploadToBunnyCDN(filePath, remotePath) {
+async function uploadToBunnyCDN(filePath, remotePath, contentType = "application/pdf") {
   try {
     // Read config at runtime to ensure environment variables are loaded
     const config = getConfig();
@@ -54,7 +55,7 @@ async function uploadToBunnyCDN(filePath, remotePath) {
       method: "PUT",
       headers: {
         AccessKey: config.STORAGE_ACCESS_KEY,
-        "Content-Type": "application/pdf",
+        "Content-Type": contentType,
       },
       body: fileBuffer,
     });
