@@ -116,6 +116,11 @@ async function generateMockups(queueItem) {
 
     // Prepare SVG map
     const svgPath = `/Users/redmarwoest/cp-automation-script/temp/selected-course-map.svg`;
+    // Ensure temp directory exists
+    const tempDir = path.dirname(svgPath);
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
     fs.writeFileSync(svgPath, svgMap);
 
     // Generate 5 color variant PDFs using Illustrator (SEQUENTIALLY)
@@ -131,6 +136,9 @@ async function generateMockups(queueItem) {
 
       // Create a mock queue item for poster generation
       const isHorizontal = orientation === "horizontal";
+      // Set size based on orientation: horizontal = 50x40cm, vertical = 40x50cm
+      const selectedSize = isHorizontal ? "50 x 40 cm" : "40 x 50 cm";
+      
       const mockPosterQueueItem = {
         queueId: `${queueId}-${colorName.toLowerCase()}`,
         orderId: `mockup-${queueId}`,
@@ -139,7 +147,7 @@ async function generateMockups(queueItem) {
           subTitle: clubName,
           underTitle: city && state ? `${city}, ${state}` : city || state || country || "",
           selectedCourseMap: svgMap,
-          selectedSize: "40 x 50 cm", // Default size matching template (400x500)
+          selectedSize: selectedSize,
           isHorizontal: isHorizontal,
           color: colorName, // Use color instead of finalColorScheme
           navigationPosition: navigationPosition || "left",
@@ -299,7 +307,6 @@ function generatePhotoshopScript(pdfPath, queueId, colorName, orientation) {
   return `
 // Photoshop script to create mockup from PDF
 // Generated for queue: ${queueId}, color: ${colorName}, orientation: ${orientation}
-
 try {
   // Step 1: Verify PDF file exists
   var pdfFile = new File("${escapedPdfPath}");
@@ -315,64 +322,156 @@ try {
     throw new Error("Template file not found: " + templateFile.fsName);
   }
   
+  // Open the template file (main mockup document)
   var templateDoc = app.open(templateFile);
   
-  // Step 3: Find the "Poster" Smart Object layer
-  var posterLayer = null;
+  // Wait a moment for the document to fully load
+  app.refresh();
+  $.sleep(500);
   
-  // Search in art layers first
-  for (var i = 0; i < templateDoc.artLayers.length; i++) {
-    var layer = templateDoc.artLayers[i];
-    if (layer.name === "Poster" && layer.kind === LayerKind.SMARTOBJECT) {
-      posterLayer = layer;
-      break;
-    }
-  }
-  
-  // If not found in art layers, search in layer sets (groups)
-  if (!posterLayer) {
-    for (var i = 0; i < templateDoc.layerSets.length; i++) {
-      var layerSet = templateDoc.layerSets[i];
-      for (var j = 0; j < layerSet.artLayers.length; j++) {
-        var layer = layerSet.artLayers[j];
-        if (layer.name === "Poster" && layer.kind === LayerKind.SMARTOBJECT) {
-          posterLayer = layer;
-          break;
-        }
+  // Step 3: Find the "PosterPlaceholder" Smart Object layer inside the Poster group
+  function findPosterPlaceholder(parent) {
+    for (var i = 0; i < parent.layers.length; i++) {
+      var lyr = parent.layers[i];
+      if (lyr.typename === "ArtLayer" &&
+          lyr.name === "PosterPlaceholder" &&
+          lyr.kind === LayerKind.SMARTOBJECT) {
+        return lyr;
       }
-      if (posterLayer) break;
+      if (lyr.typename === "LayerSet") {
+        var found = findPosterPlaceholder(lyr);
+        if (found) return found;
+      }
     }
+    return null;
   }
-  
+
+  var posterLayer = findPosterPlaceholder(templateDoc);
   if (!posterLayer) {
     templateDoc.close(SaveOptions.DONOTSAVECHANGES);
-    throw new Error("Poster layer (Smart Object) not found in template. Make sure there is a layer named 'Poster' that is a Smart Object.");
+    throw new Error("PosterPlaceholder Smart Object not found in template.");
   }
-  
-  // Step 4: Replace the Smart Object content with the PDF
-  // Select the poster layer
+
+  // Step 4: Open the Smart Object contents (PosterXX.psb)
   templateDoc.activeLayer = posterLayer;
-  
-  // Replace the Smart Object's contents with the PDF file
-  // replaceContents expects a File object and optional PlaceOptions
+  app.refresh();
+  $.sleep(200);
+
+  // Use the standard menu command to edit Smart Object contents
+  app.runMenuItem(stringIDToTypeID("placedLayerEditContents"));
+
+  // Now the active document is the Smart Object document (e.g. Poster11.psb)
+  var posterDoc = app.activeDocument;
+  app.refresh();
+  $.sleep(300);
+
+  // Step 5: Open the PDF, copy its contents, and paste into the Smart Object document
   try {
-    var placeOptions = new PDFPlaceOptions();
-    placeOptions.resolution = 300; // High resolution for print quality
-    placeOptions.mode = OpenDocumentMode.RGB;
-    placeOptions.antiAlias = true;
-    
-    // Replace the Smart Object content with the PDF
-    posterLayer.replaceContents(pdfFile, placeOptions);
-    
-    // Wait a moment for the replacement to complete
+    // Open the PDF file as a new document without showing the import dialog
+    var pdfOpenOptions = new PDFOpenOptions();
+    pdfOpenOptions.antiAlias = true;
+    pdfOpenOptions.mode = OpenDocumentMode.RGB;
+    pdfOpenOptions.resolution = 300;
+    // If the PDF has multiple pages, use the first page by default
+    try {
+      pdfOpenOptions.page = 1;
+    } catch (optErr) {
+      // ignore if property not supported
+    }
+    var pdfDoc = app.open(pdfFile, pdfOpenOptions);
     app.refresh();
+    $.sleep(500);
+    // Select all layers in the PDF document
+    pdfDoc.activeLayer = pdfDoc.layers[0];
+    pdfDoc.selection.selectAll();
+    
+    // Copy all content
+    pdfDoc.selection.copy();
+    app.refresh();
+    $.sleep(200);
+    
+    // Close the PDF document without saving
+    pdfDoc.close(SaveOptions.DONOTSAVECHANGES);
+    app.refresh();
+    $.sleep(200);
+
+    // Switch back to Smart Object document
+    app.activeDocument = posterDoc;
+    app.refresh();
+    $.sleep(200);
+
+    // Deselect everything first
+    posterDoc.selection.deselect();
+    app.refresh();
+    $.sleep(100);
+
+    // Hide all existing layers instead of deleting (safer approach)
+    for (var i = 0; i < posterDoc.artLayers.length; i++) {
+      try {
+        posterDoc.artLayers[i].visible = false;
+      } catch (e) {}
+    }
+    app.refresh();
+    $.sleep(100);
+
+    // Paste the PDF content into the Smart Object (creates new layer on top)
+    posterDoc.paste();
+    app.refresh();
+    $.sleep(500);
+
+    // Get the pasted layer
+    var pastedLayer = posterDoc.activeLayer;
+    if (pastedLayer) {
+      // Rename it to "Poster" for clarity
+      pastedLayer.name = "Poster";
+
+      // Optional: scale to fit the Smart Object canvas while preserving aspect ratio
+      var b = pastedLayer.bounds;
+      var layerW = b[2] - b[0];
+      var layerH = b[3] - b[1];
+      var docW = posterDoc.width;
+      var docH = posterDoc.height;
+
+      if (layerW > 0 && layerH > 0) {
+        var scaleX = (docW / layerW) * 100;
+        var scaleY = (docH / layerH) * 100;
+        var scale = Math.min(scaleX, scaleY);
+        pastedLayer.resize(scale, scale, AnchorPosition.MIDDLECENTER);
+      }
+
+      // Center the poster layer on the Smart Object canvas
+      var nb = pastedLayer.bounds;
+      var centerX = (nb[0] + nb[2]) / 2;
+      var centerY = (nb[1] + nb[3]) / 2;
+      var docCenterX = docW / 2;
+      var docCenterY = docH / 2;
+      pastedLayer.translate(docCenterX - centerX, docCenterY - centerY);
+    }
+    
+    app.refresh();
+    $.sleep(200);
     
   } catch (replaceError) {
-    templateDoc.close(SaveOptions.DONOTSAVECHANGES);
+    // Close Smart Object and template if error occurs
+    try {
+      posterDoc.close(SaveOptions.DONOTSAVECHANGES);
+    } catch (e) {}
+    try {
+      templateDoc.close(SaveOptions.DONOTSAVECHANGES);
+    } catch (e) {}
     throw new Error("Failed to replace Smart Object content: " + replaceError.message);
   }
   
-  // Step 5: Export the final mockup as PNG
+  // Step 6: Save and close the Smart Object document so the mockup updates
+  posterDoc.save();
+  posterDoc.close(SaveOptions.SAVECHANGES);
+  app.refresh();
+  $.sleep(300);
+
+  // Step 7: Export the final mockup as PNG from the main template document
+  app.activeDocument = templateDoc;
+  app.refresh();
+
   var outputFile = new File("${outputPath}");
   var exportOptions = new ExportOptionsSaveForWeb();
   exportOptions.format = SaveDocumentType.PNG;
