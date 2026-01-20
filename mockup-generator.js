@@ -104,6 +104,8 @@ async function generateMockups(queueItem) {
     }
 
     // Determine template file based on orientation
+    // Template files use pixel dimensions: 40x50cm = 400x500px, 50x40cm = 500x400px
+    // But we only have 400x500 templates, so we use those for both orientations
     const isHorizontal = orientation === "horizontal";
     const fileName = isHorizontal
       ? "cp-canvas__horizontal__400x500.ai"
@@ -425,27 +427,102 @@ try {
       // Rename it to "Poster" for clarity
       pastedLayer.name = "Poster";
 
-      // Optional: scale to fit the Smart Object canvas while preserving aspect ratio
-      var b = pastedLayer.bounds;
-      var layerW = b[2] - b[0];
-      var layerH = b[3] - b[1];
-      var docW = posterDoc.width;
-      var docH = posterDoc.height;
-
-      if (layerW > 0 && layerH > 0) {
-        var scaleX = (docW / layerW) * 100;
-        var scaleY = (docH / layerH) * 100;
-        var scale = Math.min(scaleX, scaleY);
-        pastedLayer.resize(scale, scale, AnchorPosition.MIDDLECENTER);
+      // Resize and center the poster layer to fit the Smart Object canvas
+      // Make sure the layer is active
+      posterDoc.activeLayer = pastedLayer;
+      app.refresh();
+      $.sleep(200);
+      
+      // Deselect any active selection (this can interfere with resize)
+      try {
+        posterDoc.selection.deselect();
+      } catch (e) {
+        // Ignore if no selection exists
       }
-
-      // Center the poster layer on the Smart Object canvas
-      var nb = pastedLayer.bounds;
-      var centerX = (nb[0] + nb[2]) / 2;
-      var centerY = (nb[1] + nb[3]) / 2;
-      var docCenterX = docW / 2;
-      var docCenterY = docH / 2;
-      pastedLayer.translate(docCenterX - centerX, docCenterY - centerY);
+      app.refresh();
+      $.sleep(100);
+      
+      // Get document dimensions (placeholder size) - convert to pixels
+      var docW = posterDoc.width.value;
+      var docH = posterDoc.height.value;
+      
+      // Get current layer dimensions
+      var b = pastedLayer.bounds;
+      var layerW = b[2].value - b[0].value;
+      var layerH = b[3].value - b[1].value;
+      
+      if (layerW > 0 && layerH > 0 && docW > 0 && docH > 0) {
+        // Calculate scales for both dimensions
+        var scaleX = docW / layerW;  // Scale to fit width exactly
+        var scaleY = docH / layerH;  // Scale to fit height exactly
+        
+        // Strategy: Fill vertically completely, but ensure no horizontal overflow
+        // Use scaleY to fill vertical space, but check if it overflows horizontally
+        var scale = scaleY; // Start with vertical fill
+        
+        // Check if using scaleY would cause horizontal overflow
+        var scaledWidth = layerW * scale;
+        if (scaledWidth > docW) {
+          // If vertical fill would overflow horizontally, use horizontal fit instead
+          // This ensures no overflow, but might leave some vertical space
+          scale = scaleX;
+        }
+        
+        // Resize the layer using the calculated scale
+        // This maintains aspect ratio while fitting the frame
+        try {
+          pastedLayer.resize(scale * 100, scale * 100, AnchorPosition.MIDDLECENTER);
+          app.refresh();
+          $.sleep(300);
+          
+          // After resize, check if we need to stretch vertically further
+          // Get the new bounds after resize
+          var newBounds = pastedLayer.bounds;
+          var newLayerH = newBounds[3].value - newBounds[1].value;
+          
+          // If the layer height is less than document height, we can stretch vertically
+          // But only if width still fits
+          if (newLayerH < docH) {
+            var newLayerW = newBounds[2].value - newBounds[0].value;
+            if (newLayerW <= docW) {
+              // We have room to stretch vertically without overflowing horizontally
+              // Calculate additional vertical stretch needed
+              var additionalScaleY = docH / newLayerH;
+              // Apply additional vertical stretch
+              pastedLayer.resize(100, additionalScaleY * 100, AnchorPosition.MIDDLECENTER);
+              app.refresh();
+              $.sleep(300);
+            }
+          }
+        } catch (resizeError) {
+          $.writeln("Warning: resize() failed, trying alternative method: " + resizeError.message);
+          // Alternative: calculate new dimensions and resize
+          var newW = layerW * scale;
+          var newH = layerH * scale;
+          // Resize using UnitValue
+          var unitW = new UnitValue(newW, "px");
+          var unitH = new UnitValue(newH, "px");
+          pastedLayer.resize(unitW, unitH, AnchorPosition.MIDDLECENTER);
+          app.refresh();
+          $.sleep(300);
+        }
+        
+        // Center the layer on the canvas
+        var nb = pastedLayer.bounds;
+        var layerCenterX = (nb[0].value + nb[2].value) / 2;
+        var layerCenterY = (nb[1].value + nb[3].value) / 2;
+        var docCenterX = docW / 2;
+        var docCenterY = docH / 2;
+        
+        var offsetX = docCenterX - layerCenterX;
+        var offsetY = docCenterY - layerCenterY;
+        
+        if (Math.abs(offsetX) > 0.1 || Math.abs(offsetY) > 0.1) {
+          pastedLayer.translate(offsetX, offsetY);
+          app.refresh();
+          $.sleep(200);
+        }
+      }
     }
     
     app.refresh();
