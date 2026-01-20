@@ -141,13 +141,27 @@ async function generateMockups(queueItem) {
       // Set size based on orientation: horizontal = 50x40cm, vertical = 40x50cm
       const selectedSize = isHorizontal ? "50 x 40 cm" : "40 x 50 cm";
       
+      // Match the same title / subtitle / underTitle format used by the custom design form:
+      // [0] title      -> club name (possibly truncated in the app, but full here is fine)
+      // [1] subtitle   -> city + country (and optional state)
+      // [2] underTitle -> "Est. {year}" when yearStarted is available, otherwise "Est. XXXX"
+      const locationParts = [];
+      if (city) locationParts.push(city);
+      if (state) locationParts.push(state);
+      if (country) locationParts.push(country);
+      const subTitleText = locationParts.join(", ");
+      const underTitleText =
+        typeof yearStarted === "number" && Number.isFinite(yearStarted)
+          ? `Est. ${yearStarted}`
+          : "Est. XXXX";
+
       const mockPosterQueueItem = {
         queueId: `${queueId}-${colorName.toLowerCase()}`,
         orderId: `mockup-${queueId}`,
         customizationData: {
-          title: courseName,
-          subTitle: clubName,
-          underTitle: city && state ? `${city}, ${state}` : city || state || country || "",
+          title: clubName || courseName,
+          subTitle: subTitleText,
+          underTitle: underTitleText,
           selectedCourseMap: svgMap,
           selectedSize: selectedSize,
           isHorizontal: isHorizontal,
