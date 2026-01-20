@@ -1,5 +1,5 @@
 ﻿
-      var file = new File("/Users/redmarwoest/course-prints/templates/cp-canvas__vertical__400x500.ai");
+      var file = new File("/Users/redmarwoest/course-prints/templates/cp-canvas__horizontal__400x500.ai");
       if (!file.exists) { throw new Error("Template file does not exist: " + file.fsName); }
       var doc = app.open(file);
 
@@ -393,7 +393,7 @@
 
               // Apply svgMapSize scaling if provided (scale from center)
               // Use horizontal size if orientation is horizontal, vertical size otherwise
-              var isHorizontal = false;
+              var isHorizontal = true;
               var svgMapSizeHorizontal = null;
               var svgMapSizeVertical = null;
               var svgMapSize = isHorizontal ? svgMapSizeHorizontal : svgMapSizeVertical;
@@ -424,7 +424,7 @@
 
       var exportFolder = Folder("/Users/redmarwoest/course-prints/exports");
       if (!exportFolder.exists) { exportFolder.create(); }
-      var exportFile = new File(exportFolder.fsName + "/ORDER_mockup-mockup-1768368863971-5bpeo9af5_Bridgewater_On_Loddon_Golf_Club_1768889279420_poster.pdf");
+      var exportFile = new File(exportFolder.fsName + "/ORDER_mockup-mockup-1768368863971-5bpeo9af5_Bridgewater_On_Loddon_Golf_Club_1768890556692_poster.pdf");
 
       var saveOptions = new PDFSaveOptions();
       saveOptions.compatibility = PDFCompatibility.ACROBAT5;

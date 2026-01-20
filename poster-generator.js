@@ -141,12 +141,19 @@ async function generatePoster(queueItem) {
     
 
     // Format size (exact same logic as generate-poster)
-    const formattedSize = selectedSize
+    // For 50x40cm horizontal and 40x50cm vertical, we use the 400x500 template
+    let formattedSize = selectedSize
       .replace(" cm", "")
       .split(" x ")
       .map(Number)
       .map((n) => Math.round(n * 10))
       .join("x");
+    
+    // Map to available template files
+    // For horizontal 50x40cm (500x400) and vertical 40x50cm (400x500), use 400x500 template
+    if (formattedSize === "500x400" || formattedSize === "400x500") {
+      formattedSize = "400x500";
+    }
 
     // Use default color scheme if none specified
     const finalColorScheme = color || 'White';

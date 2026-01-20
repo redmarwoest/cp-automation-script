@@ -332,16 +332,49 @@ try {
   $.sleep(500);
   
   // Step 3: Find the "PosterPlaceholder" Smart Object layer inside the Poster group
-  function findPosterPlaceholder(parent) {
+  // Try multiple possible names
+  var possibleNames = ["PosterPlaceholder", "Poster", "Poster11", "Poster 11", "Placeholder"];
+  
+  function findPosterPlaceholder(parent, depth) {
+    if (depth === undefined) depth = 0;
+    if (depth > 10) return null; // Prevent infinite recursion
+    
     for (var i = 0; i < parent.layers.length; i++) {
       var lyr = parent.layers[i];
-      if (lyr.typename === "ArtLayer" &&
-          lyr.name === "PosterPlaceholder" &&
-          lyr.kind === LayerKind.SMARTOBJECT) {
+      
+      // Check if this is a Smart Object layer
+      if (lyr.typename === "ArtLayer" && lyr.kind === LayerKind.SMARTOBJECT) {
+        // Check against all possible names
+        for (var j = 0; j < possibleNames.length; j++) {
+          if (lyr.name === possibleNames[j]) {
+            $.writeln("Found Smart Object: " + lyr.name);
+            return lyr;
+          }
+        }
+      }
+      
+      // Recursively search in layer sets
+      if (lyr.typename === "LayerSet") {
+        var found = findPosterPlaceholder(lyr, depth + 1);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+  
+  // Also try to find any Smart Object as fallback
+  function findAnySmartObject(parent, depth) {
+    if (depth === undefined) depth = 0;
+    if (depth > 10) return null;
+    
+    for (var i = 0; i < parent.layers.length; i++) {
+      var lyr = parent.layers[i];
+      if (lyr.typename === "ArtLayer" && lyr.kind === LayerKind.SMARTOBJECT) {
+        $.writeln("Found Smart Object (fallback): " + lyr.name);
         return lyr;
       }
       if (lyr.typename === "LayerSet") {
-        var found = findPosterPlaceholder(lyr);
+        var found = findAnySmartObject(lyr, depth + 1);
         if (found) return found;
       }
     }
@@ -349,9 +382,22 @@ try {
   }
 
   var posterLayer = findPosterPlaceholder(templateDoc);
+  
+  // If not found, try to find any Smart Object as fallback
   if (!posterLayer) {
+    $.writeln("PosterPlaceholder not found, searching for any Smart Object...");
+    posterLayer = findAnySmartObject(templateDoc);
+  }
+  
+  if (!posterLayer) {
+    // List all top-level layers for debugging
+    $.writeln("Available layers in template:");
+    for (var i = 0; i < templateDoc.layers.length; i++) {
+      var lyr = templateDoc.layers[i];
+      $.writeln("  Layer " + i + ": " + lyr.name + " (" + lyr.typename + ")");
+    }
     templateDoc.close(SaveOptions.DONOTSAVECHANGES);
-    throw new Error("PosterPlaceholder Smart Object not found in template.");
+    throw new Error("PosterPlaceholder Smart Object not found in template. Check layer names.");
   }
 
   // Step 4: Open the Smart Object contents (PosterXX.psb)
