@@ -216,6 +216,47 @@ async function markMockupQueueItemFailed(queueId, errorMessage) {
 }
 
 /**
+ * Process Shopify product creation for a completed mockup queue item
+ * This is called immediately after a mockup item is marked as completed
+ * so that Shopify products are created automatically once downloadLinks
+ * are available.
+ */
+async function processShopifyForMockupQueueItem(queueId) {
+  if (!queueId) return false;
+
+  try {
+    log("info", `🛒 Triggering Shopify product creation for mockup queue item: ${queueId}`);
+
+    const result = await makeMockupQueueRequest("process-shopify-queued", { queueId });
+
+    if (!result || !result.success) {
+      const errorMessage = result?.error || "Unknown error while processing Shopify product";
+      log(
+        "error",
+        `❌ Shopify product creation failed for mockup ${queueId}: ${errorMessage}`
+      );
+      return false;
+    }
+
+    log(
+      "info",
+      `✅ Shopify product created for mockup ${queueId}${
+        result.shopifyProductId ? ` (productId: ${result.shopifyProductId})` : ""
+      }`
+    );
+
+    return true;
+  } catch (error) {
+    log(
+      "error",
+      `❌ Error while triggering Shopify product creation for mockup ${queueId}:`,
+      error.message
+    );
+    return false;
+  }
+}
+
+/**
  * Process a single poster queue item: generate poster and handle results
  */
 async function processQueueItem(queueItem) {
@@ -282,11 +323,21 @@ async function processMockupQueueItem(queueItem) {
       throw new Error("Failed to mark mockup item as completed");
     }
 
-    // Log success
+    // Log success for mockup generation
     log("info", `✅ Successfully completed mockup: ${queueId}`);
     log("info", `📄 Illustrator files: ${result.downloadLinks.illustrator.length}`);
     log("info", `🖼️ Photoshop files: ${result.downloadLinks.photoshop.length}`);
     log("info", `📤 Sending download links to API for queue: ${queueId}`);
+
+    // Automatically trigger Shopify product creation for this completed mockup
+    const shopifyTriggered = await processShopifyForMockupQueueItem(queueId);
+    if (!shopifyTriggered) {
+      log(
+        "warn",
+        `⚠️ Shopify product creation did not complete successfully for mockup ${queueId}.` +
+          " Item will remain with shopifyStatus 'queued' or 'failed' and can be retried manually."
+      );
+    }
     
     return true;
   } catch (error) {
