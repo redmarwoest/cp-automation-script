@@ -113,6 +113,8 @@ async function generatePoster(queueItem) {
       selectedCourseMap,
       svgMapSizeHorizontal,
       svgMapSizeVertical,
+      svgMapOffsetHorizontal,
+      svgMapOffsetVertical,
     } = customizationData;
 
     // Prioritize scorecard field from PosterQueueData interface, fallback to legacy courseData
@@ -138,6 +140,8 @@ async function generatePoster(queueItem) {
       // Determine which SVG map size to use based on orientation
       const svgMapSize = isHorizontal ? svgMapSizeHorizontal : svgMapSizeVertical;
       console.log(`   🔍 SVG Map Size (${isHorizontal ? 'Horizontal' : 'Vertical'}): ${svgMapSize || 'default (100%)'}`);
+      const svgMapOffset = isHorizontal ? svgMapOffsetHorizontal : svgMapOffsetVertical;
+      console.log(`   🔍 SVG Map Vertical Offset (${isHorizontal ? 'Horizontal' : 'Vertical'}): ${svgMapOffset || '0 (centered)'}`);
     
 
     // Format size (exact same logic as generate-poster)
@@ -678,14 +682,27 @@ async function generatePoster(queueItem) {
 
               var centerX = mapElementCenterX - (newWidth / 2);
               var centerY = mapElementCenterY + (newHeight / 2);
+
+              // Apply vertical offset before positioning, based on template height
+              // Positive values move the map down, negative values move it up
+              var isHorizontal = ${isHorizontal};
+              var svgMapOffsetHorizontal = ${svgMapOffsetHorizontal ? parseFloat(svgMapOffsetHorizontal) : 'null'};
+              var svgMapOffsetVertical = ${svgMapOffsetVertical ? parseFloat(svgMapOffsetVertical) : 'null'};
+              var svgMapOffset = isHorizontal ? svgMapOffsetHorizontal : svgMapOffsetVertical;
+              if (svgMapOffset !== null && !isNaN(svgMapOffset) && svgMapOffset !== 0) {
+                try {
+                  var offsetDeltaY = (mapElementHeight * svgMapOffset) / 100.0;
+                  centerY = centerY + offsetDeltaY;
+                } catch(e) {}
+              }
               groupedMap.position = [centerX, centerY];
 
               // Apply svgMapSize scaling if provided (scale from center)
               // Use horizontal size if orientation is horizontal, vertical size otherwise
-              var isHorizontal = ${isHorizontal};
+              var isHorizontalSize = ${isHorizontal};
               var svgMapSizeHorizontal = ${svgMapSizeHorizontal ? parseFloat(svgMapSizeHorizontal) : 'null'};
               var svgMapSizeVertical = ${svgMapSizeVertical ? parseFloat(svgMapSizeVertical) : 'null'};
-              var svgMapSize = isHorizontal ? svgMapSizeHorizontal : svgMapSizeVertical;
+              var svgMapSize = isHorizontalSize ? svgMapSizeHorizontal : svgMapSizeVertical;
               if (svgMapSize !== null && svgMapSize > 0 && svgMapSize <= 100) {
                 var scaleFactor = svgMapSize / 100;
                 
