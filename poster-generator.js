@@ -219,6 +219,9 @@ async function generatePoster(queueItem) {
       const doc = dom.window.document;
 
       Object.keys(colors).forEach((key) => {
+        // Skip outline keys here - they're handled separately below
+        if (key.endsWith("Outline")) return;
+
         const elements = doc.querySelectorAll(`#${key}, #${key} *`);
 
         elements.forEach((element) => {
@@ -231,14 +234,23 @@ async function generatePoster(queueItem) {
             element.tagName === "line" ||
             element.tagName === "polyline"
           ) {
-            // Set fill if not already set and not a polyline
-            if (element.tagName !== "polyline" && element.hasAttribute("fill")) {
-              element.setAttribute("fill", colors[key] || "");
+            // Always set fill for non-polyline elements (unless fill is explicitly "none")
+            if (element.tagName !== "polyline") {
+              const currentFill = element.getAttribute("fill");
+              // Set fill if it doesn't exist, or if it exists and is not "none"
+              if ((currentFill === null || currentFill !== "none") && colors[key]) {
+                element.setAttribute("fill", colors[key]);
+              }
             }
 
-            // Set stroke if not already set
-            if (element.hasAttribute("stroke")) {
-              element.setAttribute("stroke", colors[key] || "");
+            // Don't set stroke here for elements that have outline colors
+            // (sand, green, fairway, numberContainer) - those are handled in the outline section
+            const hasOutlineColor = ["sand", "green", "fairway", "numberContainer"].includes(key);
+            if (!hasOutlineColor && colors[key]) {
+              const currentStroke = element.getAttribute("stroke");
+              if (currentStroke !== "none" && currentStroke !== null) {
+                element.setAttribute("stroke", colors[key]);
+              }
             }
           }
         });
@@ -266,8 +278,12 @@ async function generatePoster(queueItem) {
               element.tagName === "line" ||
               element.tagName === "polyline"
             ) {
-              // Apply outline color to stroke
-              element.setAttribute("stroke", colors[outlineKey] || "");
+              // Always apply outline color to stroke, even if stroke doesn't exist initially
+              // Also set stroke-width if it doesn't exist to ensure the outline is visible
+              element.setAttribute("stroke", colors[outlineKey]);
+              if (!element.hasAttribute("stroke-width")) {
+                element.setAttribute("stroke-width", "0.55"); // Default stroke width
+              }
             }
           });
         }
