@@ -1,5 +1,5 @@
 ﻿
-      var file = new File("/Users/redmarwoest/course-prints/templates/cp-canvas__vertical__300x400.ai");
+      var file = new File("/Users/redmarwoest/course-prints/templates/cp-canvas__horizontal__400x500.ai");
       if (!file.exists) { throw new Error("Template file does not exist: " + file.fsName); }
       var doc = app.open(file);
 
@@ -35,31 +35,31 @@
         return rect;
       }
 
-      var textColor = makeRGB(255,255,255);
+      var textColor = makeRGB(0,0,0);
       var extraTitleColor = makeRGB(154,126,46);
-      var backgroundColor = makeRGB(112,134,166);
+      var backgroundColor = makeRGB(255,255,255);
       var outlineInnerColor = makeRGB(154,154,154);
       var outlineOuterColor = makeRGB(0,0,0);
-      var compassColor = makeRGB(255,255,255);
+      var compassColor = makeRGB(136,136,136);
 
       var textLayer = doc.layers.getByName("text");
       if (textLayer) {
         // Set text contents - JSON.stringify properly escapes quotes and preserves Unicode characters
         // The JSX file is saved with UTF-8 encoding, so Unicode characters should render correctly
-        textLayer.textFrames[0].contents = "Sale Golf Club";
+        textLayer.textFrames[0].contents = "Domburgsche Golf Club";
         textLayer.textFrames[0].textRange.fillColor = textColor;
         // Disable All Caps / Small Caps to preserve original capitalization
         try {
           textLayer.textFrames[0].textRange.characterAttributes.capitalization = TextCase.NORMAL;
         } catch(e) {}
         
-        textLayer.textFrames[1].contents = "Sale, UK";
+        textLayer.textFrames[1].contents = "Domburg, ZLD, Netherlands";
         textLayer.textFrames[1].textRange.fillColor = textColor;
         try {
           textLayer.textFrames[1].textRange.characterAttributes.capitalization = TextCase.NORMAL;
         } catch(e) {}
         
-        textLayer.textFrames[2].contents = "Est. 1913";
+        textLayer.textFrames[2].contents = "Est. 1914";
         textLayer.textFrames[2].textRange.fillColor = textColor;
         try {
           textLayer.textFrames[2].textRange.characterAttributes.capitalization = TextCase.NORMAL;
@@ -115,7 +115,7 @@
         }
       }
 
-      var navigationPosition = "right";
+      var navigationPosition = "left";
       var compassLeftLayer = doc.layers.getByName("compasLeft");
       var compassRightLayer = doc.layers.getByName("compasRight");
       if (compassLeftLayer) compassLeftLayer.visible = (navigationPosition === "left");
@@ -137,7 +137,7 @@
         }
       }
       
-      var scorecardPosition = "left";
+      var scorecardPosition = "right";
       var showScorecard = true;
 
       var scorecardLayers = [
@@ -174,7 +174,7 @@
       try {
         var scorecardLayer = doc.layers.getByName(selectedScorecardLayer);
         if (scorecardLayer) {
-          var courseData = [{"hole":1,"par":5,"si":null,"white":502,"yellow":486,"red":421,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":2,"par":4,"si":null,"white":435,"yellow":423,"red":413,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":3,"par":3,"si":null,"white":201,"yellow":186,"red":165,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":4,"par":4,"si":null,"white":302,"yellow":297,"red":281,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":5,"par":4,"si":null,"white":438,"yellow":431,"red":425,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":6,"par":4,"si":null,"white":384,"yellow":327,"red":314,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":7,"par":4,"si":null,"white":335,"yellow":318,"red":279,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":8,"par":4,"si":null,"white":309,"yellow":292,"red":281,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":9,"par":4,"si":null,"white":426,"yellow":381,"red":335,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":10,"par":4,"si":null,"white":417,"yellow":392,"red":347,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":11,"par":3,"si":null,"white":154,"yellow":144,"red":134,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":12,"par":4,"si":null,"white":430,"yellow":380,"red":369,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":13,"par":4,"si":null,"white":373,"yellow":362,"red":304,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":14,"par":3,"si":null,"white":168,"yellow":160,"red":147,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":15,"par":4,"si":null,"white":384,"yellow":355,"red":343,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":16,"par":5,"si":null,"white":555,"yellow":538,"red":499,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":17,"par":3,"si":null,"white":116,"yellow":112,"red":109,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null},{"hole":18,"par":4,"si":null,"white":372,"yellow":360,"red":322,"blue":null,"orange":null,"gold":null,"black":null,"green":null,"silver":null,"brown":null,"purple":null,"ladiesPar":null,"ladiesSi":null}];
+          var courseData = [{"holeNumber":1,"hole":1,"par":4,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":268,"red":268,"gold":0,"green":0,"purple":0,"orange":225,"silver":0},{"holeNumber":2,"hole":2,"par":4,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":296,"red":286,"gold":0,"green":0,"purple":0,"orange":256,"silver":0},{"holeNumber":3,"hole":3,"par":3,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":142,"red":124,"gold":0,"green":0,"purple":0,"orange":119,"silver":0},{"holeNumber":4,"hole":4,"par":5,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":504,"red":442,"gold":0,"green":0,"purple":0,"orange":403,"silver":0},{"holeNumber":5,"hole":5,"par":3,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":135,"red":109,"gold":0,"green":0,"purple":0,"orange":103,"silver":0},{"holeNumber":6,"hole":6,"par":5,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":439,"red":388,"gold":0,"green":0,"purple":0,"orange":331,"silver":0},{"holeNumber":7,"hole":7,"par":4,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":331,"red":295,"gold":0,"green":0,"purple":0,"orange":257,"silver":0},{"holeNumber":8,"hole":8,"par":3,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":147,"red":129,"gold":0,"green":0,"purple":0,"orange":91,"silver":0},{"holeNumber":9,"hole":9,"par":4,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":324,"red":258,"gold":0,"green":0,"purple":0,"orange":204,"silver":0},{"holeNumber":10,"hole":10,"par":4,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":302,"red":295,"gold":0,"green":0,"purple":0,"orange":225,"silver":0},{"holeNumber":11,"hole":11,"par":4,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":296,"red":286,"gold":0,"green":0,"purple":0,"orange":256,"silver":0},{"holeNumber":12,"hole":12,"par":3,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":142,"red":124,"gold":0,"green":0,"purple":0,"orange":119,"silver":0},{"holeNumber":13,"hole":13,"par":5,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":504,"red":442,"gold":0,"green":0,"purple":0,"orange":403,"silver":0},{"holeNumber":14,"hole":14,"par":3,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":135,"red":109,"gold":0,"green":0,"purple":0,"orange":71,"silver":0},{"holeNumber":15,"hole":15,"par":5,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":439,"red":388,"gold":0,"green":0,"purple":0,"orange":331,"silver":0},{"holeNumber":16,"hole":16,"par":4,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":331,"red":295,"gold":0,"green":0,"purple":0,"orange":257,"silver":0},{"holeNumber":17,"hole":17,"par":3,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":147,"red":129,"gold":0,"green":0,"purple":0,"orange":91,"silver":0},{"holeNumber":18,"hole":18,"par":4,"si":null,"white":0,"ladiesPar":null,"ladiesSi":null,"black":0,"blue":0,"yellow":277,"red":244,"gold":0,"green":0,"purple":0,"orange":204,"silver":0}];
           var userScores = [];
           var frontNineParTotal = 0, backNineParTotal = 0, overallParTotal = 0;
           var frontNineDistanceTotal = 0, backNineDistanceTotal = 0, overallDistanceTotal = 0;
@@ -323,7 +323,7 @@
           for (var j = 0; j < scorecardLayer.textFrames.length; j++) {
             var frame = scorecardLayer.textFrames[j];
             if (frame.contents === "Meters") {
-              var distanceUnit = "yards";
+              var distanceUnit = "meters";
               // Handle specific cases: yards -> Yards, default to Meters
               var displayUnit;
               if (distanceUnit.toLowerCase() === "yards") {
@@ -389,14 +389,29 @@
 
               var centerX = mapElementCenterX - (newWidth / 2);
               var centerY = mapElementCenterY + (newHeight / 2);
+
+              // Apply vertical offset before positioning, based on template height
+              // Positive values (10) move the map DOWN, negative values (-10) move it UP
+              var isHorizontal = true;
+              var svgMapOffsetHorizontal = null;
+              var svgMapOffsetVertical = null;
+              var svgMapOffset = isHorizontal ? svgMapOffsetHorizontal : svgMapOffsetVertical;
+              if (svgMapOffset !== null && !isNaN(svgMapOffset) && svgMapOffset !== 0) {
+                try {
+                  // Invert the offset: positive (10) moves DOWN, negative (-10) moves UP
+                  // In Illustrator coordinates, Y increases downward, so we negate to fix direction
+                  var offsetDeltaY = -(mapElementHeight * svgMapOffset) / 100.0;
+                  centerY = centerY + offsetDeltaY;
+                } catch(e) {}
+              }
               groupedMap.position = [centerX, centerY];
 
               // Apply svgMapSize scaling if provided (scale from center)
               // Use horizontal size if orientation is horizontal, vertical size otherwise
-              var isHorizontal = false;
+              var isHorizontalSize = true;
               var svgMapSizeHorizontal = null;
               var svgMapSizeVertical = null;
-              var svgMapSize = isHorizontal ? svgMapSizeHorizontal : svgMapSizeVertical;
+              var svgMapSize = isHorizontalSize ? svgMapSizeHorizontal : svgMapSizeVertical;
               if (svgMapSize !== null && svgMapSize > 0 && svgMapSize <= 100) {
                 var scaleFactor = svgMapSize / 100;
                 
@@ -424,7 +439,7 @@
 
       var exportFolder = Folder("/Users/redmarwoest/course-prints/exports");
       if (!exportFolder.exists) { exportFolder.create(); }
-      var exportFile = new File(exportFolder.fsName + "/ORDER_order-1768493111721-0w9wzs_Sale_Golf_Club_1768892271363_poster.pdf");
+      var exportFile = new File(exportFolder.fsName + "/ORDER_mockup-mockup-1769163341176-apnpng1sl_Domburgsche_Golf_Club_1769163381195_poster.pdf");
 
       var saveOptions = new PDFSaveOptions();
       saveOptions.compatibility = PDFCompatibility.ACROBAT5;

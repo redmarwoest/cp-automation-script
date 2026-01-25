@@ -97,6 +97,10 @@ async function generateMockups(queueItem) {
       state,
       country,
       yearStarted,
+      svgMapSizeHorizontal,
+      svgMapSizeVertical,
+      svgMapOffsetHorizontal,
+      svgMapOffsetVertical,
     } = queueItem;
 
     if (!svgMap) {
@@ -173,6 +177,10 @@ async function generateMockups(queueItem) {
           scores: [],
           showScorecard: scoreCard && scoreCard.length > 0,
           distanceUnit: country === "USA" ? "yards" : "meters",
+          svgMapSizeHorizontal,
+          svgMapSizeVertical,
+          svgMapOffsetHorizontal,
+          svgMapOffsetVertical,
         },
       };
 

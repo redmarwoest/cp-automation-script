@@ -700,14 +700,16 @@ async function generatePoster(queueItem) {
               var centerY = mapElementCenterY + (newHeight / 2);
 
               // Apply vertical offset before positioning, based on template height
-              // Positive values move the map down, negative values move it up
+              // Positive values (10) move the map DOWN, negative values (-10) move it UP
               var isHorizontal = ${isHorizontal};
               var svgMapOffsetHorizontal = ${svgMapOffsetHorizontal ? parseFloat(svgMapOffsetHorizontal) : 'null'};
               var svgMapOffsetVertical = ${svgMapOffsetVertical ? parseFloat(svgMapOffsetVertical) : 'null'};
               var svgMapOffset = isHorizontal ? svgMapOffsetHorizontal : svgMapOffsetVertical;
               if (svgMapOffset !== null && !isNaN(svgMapOffset) && svgMapOffset !== 0) {
                 try {
-                  var offsetDeltaY = (mapElementHeight * svgMapOffset) / 100.0;
+                  // Invert the offset: positive (10) moves DOWN, negative (-10) moves UP
+                  // In Illustrator coordinates, Y increases downward, so we negate to fix direction
+                  var offsetDeltaY = -(mapElementHeight * svgMapOffset) / 100.0;
                   centerY = centerY + offsetDeltaY;
                 } catch(e) {}
               }
