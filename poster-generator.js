@@ -721,7 +721,7 @@ async function generatePoster(queueItem) {
               var svgMapSizeHorizontal = ${svgMapSizeHorizontal ? parseFloat(svgMapSizeHorizontal) : 'null'};
               var svgMapSizeVertical = ${svgMapSizeVertical ? parseFloat(svgMapSizeVertical) : 'null'};
               var svgMapSize = isHorizontalSize ? svgMapSizeHorizontal : svgMapSizeVertical;
-              if (svgMapSize !== null && svgMapSize > 0 && svgMapSize <= 100) {
+              if (svgMapSize !== null && svgMapSize > 0) {
                 var scaleFactor = svgMapSize / 100;
                 
                 // Get current center point before scaling
